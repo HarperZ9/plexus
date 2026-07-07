@@ -12,10 +12,12 @@ import argparse
 import json
 
 from . import __version__
+from .graph import to_dot, to_mermaid
 from .manifest import validate
 from .mesh import discover
 from .plan import plan_to, route
 from .registry import builtin_manifests, load_dir
+from .run import pipeline_script
 
 
 def _load(args) -> list:
@@ -53,6 +55,10 @@ def main(argv: "list[str] | None" = None) -> int:
     rp = sub.add_parser("route"); _add_source_flags(rp)
     rp.add_argument("--from", dest="src", required=True)
     rp.add_argument("--to", dest="dst", required=True)
+    gp = sub.add_parser("graph"); _add_source_flags(gp)
+    gp.add_argument("--format", default="mermaid", choices=["mermaid", "dot"])
+    up = sub.add_parser("run"); _add_source_flags(up)
+    up.add_argument("--goal", required=True, help="organ you want to feed")
 
     args = ap.parse_args(argv)
     mans = _load(args)
@@ -68,6 +74,13 @@ def main(argv: "list[str] | None" = None) -> int:
         return 0
     if args.cmd == "route":
         print(json.dumps(route(discover(mans), args.src, args.dst), indent=2))
+        return 0
+    if args.cmd == "graph":
+        mesh = discover(mans)
+        print(to_mermaid(mesh) if args.format == "mermaid" else to_dot(mesh))
+        return 0
+    if args.cmd == "run":
+        print(pipeline_script(discover(mans), args.goal))
         return 0
     if args.cmd == "validate":
         problems = {m.organ: validate(m) for m in mans}

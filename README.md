@@ -11,7 +11,12 @@ into each other's inputs* — the layer above a flat tool list.
 $ plexus discover --builtin
 $ plexus plan --goal crucible
 $ plexus route --from gather --to crucible
+$ plexus graph --format mermaid       # a diagram of the whole mesh
+$ plexus run --goal crucible          # a runnable pipeline script
 ```
+
+How it compares to MCP / LangGraph / Dagster / CrewAI: see [COMPARISON.md](COMPARISON.md).
+plexus is the discovery layer that sits *above* an executor, not another executor.
 
 ## The problem
 
@@ -103,7 +108,8 @@ pip install git+https://github.com/HarperZ9/plexus.git
 ## Library
 
 ```python
-from plexus import builtin_manifests, discover, plan_to, route
+from plexus import (builtin_manifests, discover, plan_to, route,
+                    to_mermaid, pipeline_script)
 
 mesh = discover(builtin_manifests())
 mesh.edges                      # every producer -> consumer edge, with evidence
@@ -111,6 +117,8 @@ mesh.wiring()                   # capability -> [(producer, consumer)]
 mesh.orphans()                  # unmet inputs / unconsumed outputs
 plan_to(mesh, "crucible")       # the upstream pipeline (+ any cycles)
 route(mesh, "gather", "crucible")   # the capability path between two tools
+to_mermaid(mesh)                # a Mermaid diagram of the mesh
+pipeline_script(mesh, "crucible")   # a runnable shell pipeline
 ```
 
 ## License
