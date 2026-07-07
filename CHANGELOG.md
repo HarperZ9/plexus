@@ -10,7 +10,12 @@
 - `COMPARISON.md`: grounded positioning vs MCP / LangGraph / Dagster / CrewAI —
   where plexus wins (decentralized, evidence-cited discovery) and where it does
   not (no execution engine).
-- 22 falsifiers total.
+- Manifest export (`export_all`, `plexus export`): write each flagship's
+  `<organ>.interop.json` — the exact file a tool ships to join the mesh. The
+  five real manifests are committed under `manifests/`, and a round-trip test
+  proves discovery from the JSON files matches the in-code registry exactly
+  (the format is lossless — the premise of decentralized discovery).
+- 24 falsifiers total.
 
 ## 0.1.0
 

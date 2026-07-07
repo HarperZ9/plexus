@@ -154,3 +154,17 @@ def load_dir(path: str) -> list:
             with open(os.path.join(path, name), encoding="utf-8") as f:
                 out.append(Manifest.from_dict(json.load(f)))
     return out
+
+
+def export_all(out_dir: str) -> list:
+    """Write each built-in manifest as <organ>.interop.json — the exact file a
+    flagship would ship to join the mesh. Returns the paths written."""
+    os.makedirs(out_dir, exist_ok=True)
+    written = []
+    for m in builtin_manifests():
+        p = os.path.join(out_dir, f"{m.organ}.interop.json")
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(m.to_dict(), f, indent=2, ensure_ascii=False)
+            f.write("\n")
+        written.append(p)
+    return written

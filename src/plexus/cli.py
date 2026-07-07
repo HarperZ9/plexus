@@ -16,7 +16,7 @@ from .graph import to_dot, to_mermaid
 from .manifest import validate
 from .mesh import discover
 from .plan import plan_to, route
-from .registry import builtin_manifests, load_dir
+from .registry import builtin_manifests, export_all, load_dir
 from .run import pipeline_script
 
 
@@ -59,8 +59,15 @@ def main(argv: "list[str] | None" = None) -> int:
     gp.add_argument("--format", default="mermaid", choices=["mermaid", "dot"])
     up = sub.add_parser("run"); _add_source_flags(up)
     up.add_argument("--goal", required=True, help="organ you want to feed")
+    ep = sub.add_parser("export")
+    ep.add_argument("--dir", default="manifests", help="write <organ>.interop.json files here")
 
     args = ap.parse_args(argv)
+
+    if args.cmd == "export":
+        print("\n".join(export_all(args.dir)))
+        return 0
+
     mans = _load(args)
 
     if args.cmd == "discover":
