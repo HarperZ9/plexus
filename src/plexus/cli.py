@@ -61,9 +61,13 @@ def main(argv: "list[str] | None" = None) -> int:
     up.add_argument("--goal", required=True, help="organ you want to feed")
     ep = sub.add_parser("export")
     ep.add_argument("--dir", default="manifests", help="write <organ>.interop.json files here")
+    sub.add_parser("mcp")   # stdio MCP server: discover/wiring/plan/route as tools
 
     args = ap.parse_args(argv)
 
+    if args.cmd == "mcp":
+        from .mcp import serve
+        return serve()
     if args.cmd == "export":
         print("\n".join(export_all(args.dir)))
         return 0

@@ -15,7 +15,10 @@
   five real manifests are committed under `manifests/`, and a round-trip test
   proves discovery from the JSON files matches the in-code registry exactly
   (the format is lossless — the premise of decentralized discovery).
-- 24 falsifiers total.
+- MCP server (`mcp.py`, `plexus mcp`): a zero-dep stdio JSON-RPC server exposing
+  discover / wiring / plan / route as MCP tools, so an agent can query the mesh
+  mid-task (not just a human at a CLI). `handle()` is transport-free and tested.
+- 31 falsifiers total.
 
 ## 0.1.0
 
