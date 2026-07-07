@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plexus-mesh"
+version = "0.1.0"
+description = "Capability discovery + auto-wiring for agent toolchains: point it at your tools and it discovers what each one emits and consumes, then wires producer to consumer into an executable pipeline — every edge carrying the evidence that justifies it. Zero runtime dependencies."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Zain Dana Harper" }]
+keywords = ["agent-tools", "interop", "mcp", "discovery", "pipeline", "orchestration", "capability-graph"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.scripts]
+plexus = "plexus.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/HarperZ9/plexus"
+
+[tool.setuptools.packages.find]
+where = ["src"]
