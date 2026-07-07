@@ -13,7 +13,12 @@ $ plexus plan --goal crucible
 $ plexus route --from gather --to crucible
 $ plexus graph --format mermaid       # a diagram of the whole mesh
 $ plexus run --goal crucible          # a runnable pipeline script
+$ plexus mcp                          # stdio MCP server for agents to query live
 ```
+
+An agent (Claude Code or any MCP client) can point at `plexus mcp` and call
+`plexus_discover` / `plexus_plan` / `plexus_route` while it works, so the mesh is
+consumable mid-task, not just from a human's terminal.
 
 How it compares to MCP / LangGraph / Dagster / CrewAI: see [COMPARISON.md](COMPARISON.md).
 plexus is the discovery layer that sits *above* an executor, not another executor.
