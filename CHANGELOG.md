@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0
+
+- Graph export (`to_mermaid`, `to_dot`; `plexus graph --format mermaid|dot`):
+  render the mesh as a diagram, self-loops marked distinctly.
+- Pipeline runner (`pipeline_script`; `plexus run --goal ORGAN`): turn a plan
+  into a runnable, ordered shell script that ends at the target, with feedback
+  loops surfaced as a comment.
+- `COMPARISON.md`: grounded positioning vs MCP / LangGraph / Dagster / CrewAI —
+  where plexus wins (decentralized, evidence-cited discovery) and where it does
+  not (no execution engine).
+- 22 falsifiers total.
+
 ## 0.1.0
 
 Initial release.
