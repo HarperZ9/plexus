@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.0
+
+- Graph export (`to_mermaid`, `to_dot`; `plexus graph --format mermaid|dot`):
+  render the mesh as a diagram, self-loops marked distinctly.
+- Pipeline runner (`pipeline_script`; `plexus run --goal ORGAN`): turn a plan
+  into a runnable, ordered shell script that ends at the target, with feedback
+  loops surfaced as a comment.
+- `COMPARISON.md`: grounded positioning vs MCP / LangGraph / Dagster / CrewAI —
+  where plexus wins (decentralized, evidence-cited discovery) and where it does
+  not (no execution engine).
+- Manifest export (`export_all`, `plexus export`): write each flagship's
+  `<organ>.interop.json` — the exact file a tool ships to join the mesh. The
+  five real manifests are committed under `manifests/`, and a round-trip test
+  proves discovery from the JSON files matches the in-code registry exactly
+  (the format is lossless — the premise of decentralized discovery).
+- MCP server (`mcp.py`, `plexus mcp`): a zero-dep stdio JSON-RPC server exposing
+  discover / wiring / plan / route as MCP tools, so an agent can query the mesh
+  mid-task (not just a human at a CLI). `handle()` is transport-free and tested.
+- 31 falsifiers total.
+
 ## 0.1.0
 
 Initial release.

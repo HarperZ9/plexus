@@ -12,10 +12,12 @@ import argparse
 import json
 
 from . import __version__
+from .graph import to_dot, to_mermaid
 from .manifest import validate
 from .mesh import discover
 from .plan import plan_to, route
-from .registry import builtin_manifests, load_dir
+from .registry import builtin_manifests, export_all, load_dir
+from .run import pipeline_script
 
 
 def _load(args) -> list:
@@ -53,8 +55,23 @@ def main(argv: "list[str] | None" = None) -> int:
     rp = sub.add_parser("route"); _add_source_flags(rp)
     rp.add_argument("--from", dest="src", required=True)
     rp.add_argument("--to", dest="dst", required=True)
+    gp = sub.add_parser("graph"); _add_source_flags(gp)
+    gp.add_argument("--format", default="mermaid", choices=["mermaid", "dot"])
+    up = sub.add_parser("run"); _add_source_flags(up)
+    up.add_argument("--goal", required=True, help="organ you want to feed")
+    ep = sub.add_parser("export")
+    ep.add_argument("--dir", default="manifests", help="write <organ>.interop.json files here")
+    sub.add_parser("mcp")   # stdio MCP server: discover/wiring/plan/route as tools
 
     args = ap.parse_args(argv)
+
+    if args.cmd == "mcp":
+        from .mcp import serve
+        return serve()
+    if args.cmd == "export":
+        print("\n".join(export_all(args.dir)))
+        return 0
+
     mans = _load(args)
 
     if args.cmd == "discover":
@@ -68,6 +85,13 @@ def main(argv: "list[str] | None" = None) -> int:
         return 0
     if args.cmd == "route":
         print(json.dumps(route(discover(mans), args.src, args.dst), indent=2))
+        return 0
+    if args.cmd == "graph":
+        mesh = discover(mans)
+        print(to_mermaid(mesh) if args.format == "mermaid" else to_dot(mesh))
+        return 0
+    if args.cmd == "run":
+        print(pipeline_script(discover(mans), args.goal))
         return 0
     if args.cmd == "validate":
         problems = {m.organ: validate(m) for m in mans}
