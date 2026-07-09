@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.2.0
+No version below is tagged or published to PyPI yet. The release workflow's
+publish job is gated on the repo variable PYPI_ENABLED (unset means false);
+tagging and publishing are the operator's call.
+
+## 0.2.0 (unreleased)
 
 - Graph export (`to_mermaid`, `to_dot`; `plexus graph --format mermaid|dot`):
   render the mesh as a diagram, self-loops marked distinctly.
