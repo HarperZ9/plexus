@@ -5,7 +5,7 @@ of tools and it discovers what each one emits and consumes, then wires producer
 to consumer into a runnable pipeline. Zero runtime dependencies.
 
 MCP tells an agent *that tools exist*. plexus tells it *how their outputs plug
-into each other's inputs* — the layer above a flat tool list.
+into each other's inputs*: the layer above a flat tool list.
 
 ```
 $ plexus discover --builtin
@@ -19,7 +19,7 @@ You wire up five tools. Each one produces artifacts and accepts inputs, but
 nothing knows how they connect, so you hand-wire `A | B | C` every time and
 rediscover the plumbing on every new task. plexus makes the toolchain
 self-describing: each tool ships a small manifest of what it emits and consumes,
-and plexus computes the wiring graph — which tool's output is which tool's input.
+and plexus computes the wiring graph: which tool's output is which tool's input.
 
 ## What you get
 
@@ -36,7 +36,7 @@ $ plexus wiring --builtin
 }
 ```
 
-**Plan a pipeline.** "I want to feed `crucible` — what produces its inputs?"
+**Plan a pipeline.** "I want to feed `crucible`. What produces its inputs?"
 
 ```
 $ plexus plan --goal crucible
@@ -46,7 +46,7 @@ $ plexus plan --goal crucible
 ```
 
 **Route between two tools.** "I have `gather` output and want a `crucible`
-verdict — how do they connect?"
+verdict. How do they connect?"
 
 ```
 $ plexus route --from gather --to crucible
@@ -55,7 +55,7 @@ $ plexus route --from gather --to crucible
 
 ## How a tool plugs in
 
-A manifest is plain JSON — a tool ships one and it joins the mesh. Drop
+A manifest is plain JSON. A tool ships one and it joins the mesh. Drop
 `*.interop.json` files in a directory and `plexus discover --dir DIR` reads them:
 
 ```json
@@ -74,7 +74,7 @@ A manifest is plain JSON — a tool ships one and it joins the mesh. Drop
 ```
 
 An edge `A -> B` forms when `B` consumes a capability that `A` emits (directly,
-or via `consumable_as` — the way a producer declares "my output is also
+or via `consumable_as`, the way a producer declares "my output is also
 consumable as X"). Matching is by capability string, so an edge only exists where
 the tools genuinely compose.
 
@@ -87,11 +87,11 @@ source, not invented.
 
 plexus is also honest about what does **not** connect:
 
-- `orphans().unmet_inputs` — capabilities something consumes that nothing in the
+- `orphans().unmet_inputs`: capabilities something consumes that nothing in the
   set emits (an external or human input).
-- `orphans().unconsumed_outputs` — artifacts nobody downstream consumes (terminal
+- `orphans().unconsumed_outputs`: artifacts nobody downstream consumes (terminal
   outputs).
-- `plan(...).cyclic` — feedback loops, surfaced instead of forced into a false
+- `plan(...).cyclic`: feedback loops, surfaced instead of forced into a false
   linear order.
 
 ## Install
