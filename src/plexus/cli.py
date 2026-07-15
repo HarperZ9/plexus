@@ -12,7 +12,7 @@ import argparse
 import json
 
 from . import __version__
-from .manifest import validate
+from .manifest import duplicate_organs, validate
 from .mesh import discover
 from .plan import plan_to, route
 from .registry import builtin_manifests, load_dir
@@ -33,6 +33,7 @@ def _mesh_json(mesh) -> dict:
                    "via": e.producer_module, "evidence": e.evidence}
                   for e in mesh.edges],
         "orphans": mesh.orphans(),
+        "collisions": mesh.collisions,
     }
 
 
@@ -72,9 +73,15 @@ def main(argv: "list[str] | None" = None) -> int:
         return 0
     if args.cmd == "validate":
         problems = {m.organ: validate(m) for m in mans}
-        problems = {k: v for k, v in problems.items() if v}
-        print(json.dumps(problems or {"ok": True}, indent=2))
-        return 1 if problems else 0
+        report = {k: v for k, v in problems.items() if v}
+        dups = duplicate_organs(mans)
+        if dups:
+            # A set-level clash the per-organ dict above cannot show (its own key
+            # collapses the duplicates); name it so a collision can never launder
+            # to {"ok": true}.
+            report["duplicate_organs"] = dups
+        print(json.dumps(report or {"ok": True}, indent=2))
+        return 1 if report else 0
     return 2
 
 
