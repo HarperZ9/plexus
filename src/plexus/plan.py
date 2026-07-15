@@ -4,17 +4,25 @@ Two questions a user actually asks:
   - "I want to feed tool X — what upstream chain produces its inputs?" -> plan_to
   - "I have tool A's output and want tool B's verdict — how do they connect?" -> route
 
-Both return ordered steps naming the concrete invocation (each organ's CLI) plus
-the capability that justifies each hop, so the plan is runnable and auditable.
+Both return ordered steps naming each hop's invocation (the declared CLI) plus
+the capability that justifies it. A hop is auditable always; it is runnable only
+when both ends declare a CLI. When one does not, the hop is marked
+`runnable: false` and the absence is named, never coerced into a command.
 """
 from __future__ import annotations
 
 from .mesh import Mesh
 
 
-def _cli(mesh: Mesh, organ: str) -> str:
+def _cli(mesh: Mesh, organ: str):
+    """The declared CLI for an organ, or None when the manifest declares none.
+    Absence is returned honestly, never laundered into the organ id."""
     inv = mesh.manifests[organ].invoke if organ in mesh.manifests else {}
-    return inv.get("cli") or organ
+    return inv.get("cli")
+
+
+def _token(cli, organ: str) -> str:
+    return cli if cli else f"{organ}(no cli declared)"
 
 
 def _toposort(mesh: Mesh, nodes: set) -> tuple:
@@ -59,11 +67,15 @@ def plan_to(mesh: Mesh, target: str) -> dict:
     nodes = upstream | {target}
 
     order, cyclic = _toposort(mesh, nodes)
-    hops = [{"producer": e.producer, "consumer": e.consumer,
-             "capability": e.capability,
-             "invoke": f"{_cli(mesh, e.producer)} -> {_cli(mesh, e.consumer)}"}
-            for e in mesh.edges
-            if not e.self_loop and e.producer in nodes and e.consumer in nodes]
+    hops = []
+    for e in mesh.edges:
+        if e.self_loop or e.producer not in nodes or e.consumer not in nodes:
+            continue
+        p_cli, c_cli = _cli(mesh, e.producer), _cli(mesh, e.consumer)
+        hops.append({"producer": e.producer, "consumer": e.consumer,
+                     "capability": e.capability,
+                     "invoke": f"{_token(p_cli, e.producer)} -> {_token(c_cli, e.consumer)}",
+                     "runnable": p_cli is not None and c_cli is not None})
     incoming = {c for _, c in [(e.producer, e.consumer) for e in mesh.edges
                                if not e.self_loop and e.producer in nodes
                                and e.consumer in nodes and e.producer != e.consumer]}

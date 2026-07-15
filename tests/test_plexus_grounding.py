@@ -1,6 +1,9 @@
-"""Grounding falsifiers: the built-in registry must produce the REAL flagship
-edges (the ones the code already composes), not invented ones. If a flagship's
-interop surface changes and the manifest goes stale, these break.
+"""Grounding falsifiers: the built-in registry must produce the SAME edges its
+seed declares (internal consistency of the hardcoded manifests). These do NOT
+read flagship source: the built-in manifests are DECLARED citations, re-checked
+by no probe here, so a flagship renaming a cited symbol will NOT break them. That
+staleness is a known, disclosed limit (see registry.py), not something this suite
+can catch.
 """
 from plexus.mesh import discover
 from plexus.plan import plan_to, route
@@ -34,9 +37,10 @@ def test_flagship_action_envelopes_feed_the_index_spine():
     feeders = {e.producer for e in m.edges if e.consumer == "index" and e.capability == cap}
     assert {"gather", "crucible", "forum", "index"} <= feeders          # all peers + self
 
-def test_every_edge_cites_a_producing_module():
+def test_every_edge_is_declared_with_a_cited_module():
     for e in _mesh().edges:
-        assert e.producer_module and ":" in e.producer_module          # evidence, not assertion
+        assert e.evidence == "declared"                                # plexus probes nothing
+        assert e.producer_module and ":" in e.producer_module          # a self-declared pointer to check
 
 
 def test_plan_to_crucible_pulls_the_upstream_producers():

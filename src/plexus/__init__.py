@@ -1,8 +1,9 @@
-"""plexus — capability discovery + auto-wiring for agent toolchains.
+"""plexus: capability discovery + auto-wiring for agent toolchains.
 
 Point it at a set of tools that ship interop manifests and it discovers what each
-one emits and consumes, then wires producer to consumer into a runnable pipeline
-— every edge carrying the module that justifies it. Zero runtime dependencies.
+one emits and consumes, then wires producer to consumer into a pipeline, every
+edge tagged `declared` and carrying the module its producer names. plexus does
+not import, probe, or run those tools. Zero runtime dependencies.
 """
 from .graph import to_dot, to_mermaid
 from .manifest import Manifest, Port, validate
