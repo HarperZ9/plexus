@@ -52,11 +52,13 @@ class Manifest:
                     out.append(Port(capability=p))
                 elif isinstance(p, dict):
                     out.append(Port(
-                        capability=p["capability"], title=p.get("title", ""),
+                        capability=p.get("capability", ""), title=p.get("title", ""),
                         module=p.get("module", ""), summary=p.get("summary", ""),
                         consumable_as=tuple(p.get("consumable_as", ()))))
             return out
-        return Manifest(organ=d["organ"], invoke=d.get("invoke", {}),
+        # Tolerant by contract: a missing organ or capability becomes an empty
+        # string that validate() reports; from_dict never raises on malformed input.
+        return Manifest(organ=d.get("organ", ""), invoke=d.get("invoke", {}),
                         emits=ports("emits"), consumes=ports("consumes"),
                         evidence=list(d.get("evidence", [])))
 
@@ -104,6 +106,10 @@ def validate(m) -> list:
             if not isinstance(p, Port) or not p.capability:
                 issues.append(f"{side}[{i}] has no capability")
                 continue
+            if side == "emits" and not p.module:
+                # The producing module is the evidence the "cites its module"
+                # claim rests on; an emit without it is a receipt-less claim.
+                issues.append(f"emits[{i}] {p.capability!r} has no module evidence")
             key = (side, p.capability)
             if key in seen:
                 issues.append(f"{side} declares {p.capability!r} twice")

@@ -116,3 +116,45 @@ def test_discover_output_carries_a_receipt():
     entries = {e["organ"]: e for e in rec["manifests"]}
     assert entries["gather"]["source"] == "builtin:registry"
     assert all(len(e["sha256"]) == 64 for e in rec["manifests"])
+
+
+# ---------------------------------------------------------------- DEFECT D
+# validate() must be able to FAIL on empty-module evidence: an emit that claims
+# a capability with no module pointer is a receipt-less claim under the
+# "every edge cites its module" banner.
+
+def test_validate_flags_emit_port_without_module_evidence():
+    m = Manifest(organ="t", emits=[Port("x/1")])     # capability, but no module
+    assert any("module" in p for p in validate(m))
+
+
+def test_validate_stays_clean_for_a_grounded_emit():
+    m = Manifest(organ="t", emits=[Port("x/1", module="t.py:x")])
+    assert validate(m) == []
+
+
+# ---------------------------------------------------------------- DEFECT E
+# The validator contract ("reports malformed input; never raises") must hold on
+# the external path: from_dict must not raise on a manifest missing organ or a
+# port missing capability.
+
+def test_from_dict_does_not_raise_on_missing_organ():
+    m = Manifest.from_dict({"emits": [{"title": "x"}]})   # no organ key
+    assert "organ id missing or not a string" in validate(m)
+
+
+def test_from_dict_tolerates_port_missing_capability():
+    m = Manifest.from_dict({"organ": "t", "emits": [{"title": "x"}]})
+    assert any("has no capability" in p for p in validate(m))
+
+
+def test_validate_cli_reports_malformed_file_without_crashing(tmp_path, capsys):
+    import json as _json
+
+    from plexus.cli import main
+    (tmp_path / "bad.interop.json").write_text('{"emits":[{"title":"x"}]}')
+    rc = main(["validate", "--dir", str(tmp_path)])      # must not raise KeyError
+    out = _json.loads(capsys.readouterr().out)
+    assert rc == 1
+    assert out["ok"] is not True if "ok" in out else True
+    assert "organ id missing or not a string" in out[""]
