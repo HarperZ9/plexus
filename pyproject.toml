@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "plexus-mesh"
 version = "0.1.0"
-description = "Capability discovery + auto-wiring for agent toolchains: point it at your tools and it discovers what each one emits and consumes, then wires producer to consumer into an executable pipeline — every edge carrying the evidence that justifies it. Zero runtime dependencies."
+description = "Capability discovery + auto-wiring for agent toolchains: point it at your tools and it discovers what each one emits and consumes, then wires producer to consumer into a pipeline, every edge tagged declared and citing the module its producer names. plexus does not probe or run the tools. Zero runtime dependencies."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

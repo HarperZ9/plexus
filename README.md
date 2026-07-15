@@ -75,15 +75,19 @@ A manifest is plain JSON. A tool ships one and it joins the mesh. Drop
 
 An edge `A -> B` forms when `B` consumes a capability that `A` emits (directly,
 or via `consumable_as`, the way a producer declares "my output is also
-consumable as X"). Matching is by capability string, so an edge only exists where
-the tools genuinely compose.
+consumable as X"). Matching is by capability string, so an edge exists wherever
+the tools DECLARE compatible capabilities. plexus does not run the tools, so the
+edge is a declared claim, not a probed result.
 
-## Grounded, not asserted
+## Declared, not probed
 
-Every edge cites the **module** that produces it (`file:function`), so a claimed
-connection traces back to real code. The built-in manifests for the five
-flagships (gather, crucible, forum, index, mneme) were read out of their actual
-source, not invented.
+Every edge is tagged `evidence: "declared"` and cites the **module** its producer
+names as the source (`file:function`). plexus does not import, resolve, or run
+that pointer, so the citation is a self-reported claim to check, not a verified
+receipt. The built-in manifests for the five flagships (gather, crucible, forum,
+index, mneme) were transcribed by hand from a one-time source survey (2026-07-07);
+the running tool re-checks none of it, so treat every edge as declared until you
+follow the pointer yourself.
 
 plexus is also honest about what does **not** connect:
 
@@ -106,7 +110,7 @@ pip install git+https://github.com/HarperZ9/plexus.git
 from plexus import builtin_manifests, discover, plan_to, route
 
 mesh = discover(builtin_manifests())
-mesh.edges                      # every producer -> consumer edge, with evidence
+mesh.edges                      # every producer -> consumer edge, each tagged declared
 mesh.wiring()                   # capability -> [(producer, consumer)]
 mesh.orphans()                  # unmet inputs / unconsumed outputs
 plan_to(mesh, "crucible")       # the upstream pipeline (+ any cycles)

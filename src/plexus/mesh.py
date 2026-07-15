@@ -2,9 +2,14 @@
 
 Given a set of manifests, the mesh computes producer -> consumer EDGES: for every
 capability a tool consumes, it finds the tools that emit something satisfying it.
-This is the layer MCP tool lists lack — MCP tells an agent that tools exist; the
-mesh tells it how their OUTPUTS chain into each other's INPUTS. Every edge cites
-the producing and consuming modules, so the wiring is evidence-backed.
+This is the layer MCP tool lists lack: MCP tells an agent that tools exist; the
+mesh tells it how their OUTPUTS chain into each other's INPUTS.
+
+An edge is DECLARED, not probed. It forms by matching capability strings the
+manifests self-report; plexus never imports, resolves, or runs the tools, so it
+cannot confirm the cited module exists or that the outputs truly compose. Every
+edge is tagged `evidence="declared"` and carries the module its producer names,
+a self-reported citation to follow, not a verified receipt.
 """
 from __future__ import annotations
 
@@ -21,6 +26,7 @@ class Edge:
     producer_module: str
     consumer_module: str
     self_loop: bool = False
+    evidence: str = "declared"   # "declared": self-reported, never probed by plexus
 
 
 @dataclass
@@ -74,6 +80,7 @@ def discover(manifests: list) -> Mesh:
                             producer=producer.organ, consumer=consumer.organ,
                             capability=want.capability,
                             producer_module=emit.module, consumer_module=want.module,
-                            self_loop=(producer.organ == consumer.organ)))
+                            self_loop=(producer.organ == consumer.organ),
+                            evidence="declared"))
     edges.sort(key=lambda e: (e.capability, e.producer, e.consumer))
     return Mesh(organs=sorted(mans), edges=edges, manifests=mans)

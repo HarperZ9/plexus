@@ -30,7 +30,8 @@ def _mesh_json(mesh) -> dict:
         "organs": mesh.organs,
         "edges": [{"producer": e.producer, "consumer": e.consumer,
                    "capability": e.capability, "self_loop": e.self_loop,
-                   "via": e.producer_module} for e in mesh.edges],
+                   "via": e.producer_module, "evidence": e.evidence}
+                  for e in mesh.edges],
         "orphans": mesh.orphans(),
     }
 

@@ -2,15 +2,16 @@
 
 A manifest is a tool's interop contract: the capabilities it EMITS (re-checkable
 artifacts another tool could consume) and the capabilities it CONSUMES (inputs it
-accepts). A capability is a stable string — a schema id like
+accepts). A capability is a stable string: a schema id like
 "mneme.crucible-export/1" or a shared-spine kind like
-"project-telos.flagship-action/v1". Matching is by capability, so an edge only
-forms when a producer's output is genuinely a consumer's input.
+"project-telos.flagship-action/v1". Matching is by capability string, so an edge
+forms when a producer DECLARES a capability the consumer DECLARES it accepts.
 
-Every port carries `module` (a file:function pointer) as EVIDENCE, so a claimed
-edge can be traced back to the code that produces or consumes it — the mesh is
-grounded, not asserted. A manifest is a plain dict/JSON, so any tool in any
-language can ship one; nothing here imports the tools it describes.
+Every port carries `module` (a file:function pointer) the producer names as the
+source. plexus does not import, resolve, or run that pointer, so the mesh is
+DECLARED, not probed: the module is a self-reported citation to follow, not a
+verified receipt. A manifest is a plain dict/JSON, so any tool in any language
+can ship one; nothing here imports the tools it describes.
 """
 from __future__ import annotations
 
