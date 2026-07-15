@@ -97,6 +97,16 @@ plexus is also honest about what does **not** connect:
   outputs).
 - `plan(...).cyclic`: feedback loops, surfaced instead of forced into a false
   linear order.
+- `discover().collisions`: organ ids declared by more than one manifest, named
+  rather than silently resolved last-writer-wins.
+
+## Receipt
+
+`plexus discover` stamps a `receipt` on its output: the plexus version, a UTC
+timestamp, and for every manifest read its `source` (`builtin:registry` or the
+file path) plus a `sha256` over the manifest's canonical content. The hash binds
+what was declared, so a stranger can recompute it from the same bytes and pin the
+mesh to exactly the manifests that produced it.
 
 ## Install
 
