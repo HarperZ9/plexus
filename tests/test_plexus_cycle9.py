@@ -158,3 +158,22 @@ def test_validate_cli_reports_malformed_file_without_crashing(tmp_path, capsys):
     assert rc == 1
     assert out["ok"] is not True if "ok" in out else True
     assert "organ id missing or not a string" in out[""]
+
+
+# ---------------------------------------------------------------- DEFECT F
+# plan_to must not fabricate a runnable command for a tool that declared no CLI:
+# the absent invocation is an honest null, not the organ id coerced into a command.
+
+def test_plan_marks_hop_nonrunnable_when_no_cli_declared():
+    prod = _m("p", invoke={}, emits=[Port("x/1", module="p.py:x")])   # no invoke.cli
+    cons = _m("c", invoke={"cli": "c"}, consumes=[Port("x/1", module="c.py:in")])
+    hop = next(h for h in plan_to(discover([prod, cons]), "c")["hops"]
+               if h["producer"] == "p")
+    assert hop["runnable"] is False
+    assert "no cli declared" in hop["invoke"]     # absence named, not fabricated
+
+
+def test_plan_hop_runnable_when_both_clis_declared():
+    from plexus.registry import builtin_manifests
+    plan = plan_to(discover(builtin_manifests()), "crucible")
+    assert plan["hops"] and all(h["runnable"] for h in plan["hops"])
