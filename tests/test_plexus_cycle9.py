@@ -79,3 +79,40 @@ def test_validate_cli_fails_on_organ_collision(tmp_path, capsys):
     out = _json.loads(capsys.readouterr().out)
     assert rc == 1                               # collision cannot launder to ok
     assert out["duplicate_organs"] == ["gather"]
+
+
+# ---------------------------------------------------------------- DEFECT C
+# The primary output must carry a re-runnable receipt: per-manifest source +
+# content hash, plus the plexus version (tenet 3, no receipt no accept).
+
+def test_content_hash_is_stable_and_binds_content():
+    from plexus.manifest import content_hash
+    a = _m("t", emits=[Port("x/1", module="a.py:x")])
+    b = _m("t", emits=[Port("x/1", module="a.py:x")])
+    c = _m("t", emits=[Port("x/1", module="a.py:CHANGED")])
+    assert content_hash(a) == content_hash(b)    # same content, same hash
+    assert content_hash(a) != content_hash(c)    # a changed pointer changes it
+    assert len(content_hash(a)) == 64            # sha256 hex
+
+
+def test_load_dir_tags_manifest_source(tmp_path):
+    import json as _json
+
+    from plexus.registry import builtin_manifests, load_dir
+    (tmp_path / "mytool.interop.json").write_text(_json.dumps(
+        {"organ": "mytool", "emits": [{"capability": "x/1", "module": "a.py:b"}]}))
+    loaded = load_dir(str(tmp_path))
+    assert loaded[0].source.endswith("mytool.interop.json")
+    assert all(m.source == "builtin:registry" for m in builtin_manifests())
+
+
+def test_discover_output_carries_a_receipt():
+    from plexus.cli import _mesh_json
+    from plexus.registry import builtin_manifests
+    j = _mesh_json(discover(builtin_manifests()))
+    rec = j["receipt"]
+    assert rec["plexus_version"]
+    assert "generated_utc" in rec
+    entries = {e["organ"]: e for e in rec["manifests"]}
+    assert entries["gather"]["source"] == "builtin:registry"
+    assert all(len(e["sha256"]) == 64 for e in rec["manifests"])

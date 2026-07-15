@@ -144,15 +144,24 @@ _SEED = [
 
 
 def builtin_manifests() -> list:
-    """The five grounded flagship manifests."""
-    return [Manifest.from_dict(d) for d in _SEED]
+    """The five built-in flagship manifests, tagged with their in-code source."""
+    out = []
+    for d in _SEED:
+        m = Manifest.from_dict(d)
+        m.source = "builtin:registry"
+        out.append(m)
+    return out
 
 
 def load_dir(path: str) -> list:
-    """Load every *.interop.json manifest in a directory (external tools)."""
+    """Load every *.interop.json manifest in a directory (external tools). Each
+    manifest records the file it was read from as its provenance source."""
     out = []
     for name in sorted(os.listdir(path)):
         if name.endswith(".interop.json"):
-            with open(os.path.join(path, name), encoding="utf-8") as f:
-                out.append(Manifest.from_dict(json.load(f)))
+            full = os.path.join(path, name)
+            with open(full, encoding="utf-8") as f:
+                m = Manifest.from_dict(json.load(f))
+            m.source = full
+            out.append(m)
     return out

@@ -15,6 +15,8 @@ can ship one; nothing here imports the tools it describes.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass, field
 
 
@@ -39,6 +41,7 @@ class Manifest:
     emits: list = field(default_factory=list)    # list[Port]
     consumes: list = field(default_factory=list)  # list[Port]
     evidence: list = field(default_factory=list)  # file paths the manifest was grounded on
+    source: str = ""                              # provenance: "builtin:registry" or the file path read
 
     @staticmethod
     def from_dict(d: dict) -> "Manifest":
@@ -65,6 +68,14 @@ class Manifest:
         return {"organ": self.organ, "invoke": self.invoke,
                 "emits": dump(self.emits), "consumes": dump(self.consumes),
                 "evidence": self.evidence}
+
+
+def content_hash(m) -> str:
+    """sha256 over the manifest's canonical content (its to_dict, sorted keys).
+    Source is deliberately excluded, so the hash binds WHAT was declared, not
+    where it was read; a stranger can recompute it from the same bytes."""
+    canonical = json.dumps(m.to_dict(), sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def duplicate_organs(manifests: list) -> list:
