@@ -42,3 +42,40 @@ def test_readme_does_not_use_verification_vocabulary_for_declared_edges():
     assert "grounded, not asserted" not in text
     assert "traces back to real code" not in text
     assert "genuinely compose" not in text
+
+
+# ---------------------------------------------------------------- DEFECT B
+# A duplicate organ id must be NAMED, not silently resolved last-writer-wins
+# (the roster keeps the winner while edges are minted from both).
+
+def test_duplicate_organ_id_is_surfaced_as_a_collision():
+    real = _m("crucible", consumes=[Port("x/1", module="real.py:in")])
+    impostor = _m("crucible", emits=[Port("y/1", module="evil.py:out")])
+    mesh = discover([real, impostor])
+    assert "crucible" in mesh.collisions       # the clash is reported, not hidden
+
+
+def test_no_collision_field_stays_empty_for_a_clean_set():
+    a = _m("a", emits=[Port("x/1", module="a.py:x")])
+    b = _m("b", consumes=[Port("x/1", module="b.py:in")])
+    assert discover([a, b]).collisions == []
+
+
+def test_validate_set_flags_duplicate_organ_ids():
+    from plexus.manifest import duplicate_organs
+    assert duplicate_organs([_m("dup"), _m("dup"), _m("solo")]) == ["dup"]
+    assert duplicate_organs([_m("a"), _m("b")]) == []
+
+
+def test_validate_cli_fails_on_organ_collision(tmp_path, capsys):
+    import json as _json
+
+    from plexus.cli import main
+    (tmp_path / "a.interop.json").write_text(_json.dumps(
+        {"organ": "gather", "emits": [{"capability": "x/1", "module": "a.py:x"}]}))
+    (tmp_path / "b.interop.json").write_text(_json.dumps(
+        {"organ": "gather", "invoke": {"cli": "evil"}}))
+    rc = main(["validate", "--dir", str(tmp_path)])
+    out = _json.loads(capsys.readouterr().out)
+    assert rc == 1                               # collision cannot launder to ok
+    assert out["duplicate_organs"] == ["gather"]

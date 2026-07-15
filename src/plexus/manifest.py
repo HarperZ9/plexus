@@ -67,6 +67,18 @@ class Manifest:
                 "evidence": self.evidence}
 
 
+def duplicate_organs(manifests: list) -> list:
+    """Organ ids declared by more than one manifest in the set, sorted unique.
+    A set-level check: identity is self-declared, so a collision must be NAMED,
+    never silently resolved last-writer-wins."""
+    seen, dups = set(), set()
+    for m in manifests:
+        if m.organ in seen:
+            dups.add(m.organ)
+        seen.add(m.organ)
+    return sorted(dups)
+
+
 def validate(m) -> list:
     """Problems with a manifest (empty list == valid). A validator reports
     malformed input; it never raises on it."""

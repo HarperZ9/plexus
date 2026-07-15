@@ -13,9 +13,9 @@ a self-reported citation to follow, not a verified receipt.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from .manifest import Manifest
+from .manifest import Manifest, duplicate_organs
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,8 @@ class Edge:
 class Mesh:
     organs: list           # organ ids, sorted
     edges: list            # list[Edge]
-    manifests: dict        # organ -> Manifest
+    manifests: dict        # organ -> Manifest (deduped, last-writer-wins)
+    collisions: list = field(default_factory=list)  # organ ids declared more than once
 
     def wiring(self) -> dict:
         """capability -> sorted list of (producer, consumer) pairs."""
@@ -83,4 +84,5 @@ def discover(manifests: list) -> Mesh:
                             self_loop=(producer.organ == consumer.organ),
                             evidence="declared"))
     edges.sort(key=lambda e: (e.capability, e.producer, e.consumer))
-    return Mesh(organs=sorted(mans), edges=edges, manifests=mans)
+    return Mesh(organs=sorted(mans), edges=edges, manifests=mans,
+                collisions=duplicate_organs(manifests))
