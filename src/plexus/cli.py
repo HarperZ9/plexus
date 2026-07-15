@@ -10,10 +10,11 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 
 from . import __version__
 from .graph import to_dot, to_mermaid
-from .manifest import validate
+from .manifest import content_hash, duplicate_organs, validate
 from .mesh import discover
 from .plan import plan_to, route
 from .registry import builtin_manifests, export_all, load_dir
@@ -27,13 +28,28 @@ def _load(args) -> list:
     return mans
 
 
+def _receipt(mesh) -> dict:
+    """A re-runnable provenance receipt for the mesh: which manifests were read,
+    from where, and a content hash a stranger can recompute from the same bytes."""
+    return {
+        "plexus_version": __version__,
+        "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "manifests": [{"organ": m.organ, "source": m.source,
+                       "sha256": content_hash(m)}
+                      for m in sorted(mesh.manifests.values(), key=lambda m: m.organ)],
+    }
+
+
 def _mesh_json(mesh) -> dict:
     return {
         "organs": mesh.organs,
         "edges": [{"producer": e.producer, "consumer": e.consumer,
                    "capability": e.capability, "self_loop": e.self_loop,
-                   "via": e.producer_module} for e in mesh.edges],
+                   "via": e.producer_module, "evidence": e.evidence}
+                  for e in mesh.edges],
         "orphans": mesh.orphans(),
+        "collisions": mesh.collisions,
+        "receipt": _receipt(mesh),
     }
 
 
@@ -95,9 +111,15 @@ def main(argv: "list[str] | None" = None) -> int:
         return 0
     if args.cmd == "validate":
         problems = {m.organ: validate(m) for m in mans}
-        problems = {k: v for k, v in problems.items() if v}
-        print(json.dumps(problems or {"ok": True}, indent=2))
-        return 1 if problems else 0
+        report = {k: v for k, v in problems.items() if v}
+        dups = duplicate_organs(mans)
+        if dups:
+            # A set-level clash the per-organ dict above cannot show (its own key
+            # collapses the duplicates); name it so a collision can never launder
+            # to {"ok": true}.
+            report["duplicate_organs"] = dups
+        print(json.dumps(report or {"ok": True}, indent=2))
+        return 1 if report else 0
     return 2
 
 
