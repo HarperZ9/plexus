@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .manifest import Manifest, duplicate_organs
+from .manifest import duplicate_organs
 
 
 @dataclass(frozen=True)
