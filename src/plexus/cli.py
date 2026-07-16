@@ -71,6 +71,10 @@ def main(argv: "list[str] | None" = None) -> int:
     rp = sub.add_parser("route"); _add_source_flags(rp)
     rp.add_argument("--from", dest="src", required=True)
     rp.add_argument("--to", dest="dst", required=True)
+    vp = sub.add_parser("verify"); _add_source_flags(vp)
+    vp.add_argument("--plan", required=True,
+                    help="a plan/route JSON file (from `plexus plan`/`route`) to re-derive "
+                         "and re-verify against the current mesh")
     gp = sub.add_parser("graph"); _add_source_flags(gp)
     gp.add_argument("--format", default="mermaid", choices=["mermaid", "dot"])
     up = sub.add_parser("run"); _add_source_flags(up)
@@ -102,6 +106,14 @@ def main(argv: "list[str] | None" = None) -> int:
     if args.cmd == "route":
         print(json.dumps(route(discover(mans), args.src, args.dst), indent=2))
         return 0
+    if args.cmd == "verify":
+        from .receipt import verify_plan
+        with open(args.plan, encoding="utf-8") as f:
+            plan = json.load(f)
+        ok = verify_plan(plan, discover(mans))
+        print(json.dumps({"verified": ok, "target": plan.get("target"),
+                          "source": plan.get("source")}, indent=2))
+        return 0 if ok else 1
     if args.cmd == "graph":
         mesh = discover(mans)
         print(to_mermaid(mesh) if args.format == "mermaid" else to_dot(mesh))

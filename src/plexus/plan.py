@@ -12,6 +12,7 @@ when both ends declare a CLI. When one does not, the hop is marked
 from __future__ import annotations
 
 from .mesh import Mesh
+from .receipt import build_plan_receipt
 
 
 def _cli(mesh: Mesh, organ: str):
@@ -79,8 +80,10 @@ def plan_to(mesh: Mesh, target: str) -> dict:
     incoming = {c for _, c in [(e.producer, e.consumer) for e in mesh.edges
                                if not e.self_loop and e.producer in nodes
                                and e.consumer in nodes and e.producer != e.consumer]}
-    return {"target": target, "order": order, "hops": hops, "cyclic": cyclic,
+    plan = {"target": target, "order": order, "hops": hops, "cyclic": cyclic,
             "sources": [n for n in order if n not in incoming]}
+    plan["receipt"] = build_plan_receipt(mesh, plan)
+    return plan
 
 
 def route(mesh: Mesh, source: str, target: str) -> dict:
@@ -100,7 +103,9 @@ def route(mesh: Mesh, source: str, target: str) -> dict:
             prev[e.consumer] = e
             queue.append(e.consumer)
     if target not in prev:
-        return {"source": source, "target": target, "path": [], "connected": False}
+        out = {"source": source, "target": target, "path": [], "connected": False}
+        out["receipt"] = build_plan_receipt(mesh, out)
+        return out
     chain = []
     node = target
     while prev[node] is not None:
@@ -109,5 +114,7 @@ def route(mesh: Mesh, source: str, target: str) -> dict:
                       "capability": e.capability})
         node = e.producer
     chain.reverse()
-    return {"source": source, "target": target, "connected": True,
-            "hops": len(chain), "path": chain}
+    out = {"source": source, "target": target, "connected": True,
+           "hops": len(chain), "path": chain}
+    out["receipt"] = build_plan_receipt(mesh, out)
+    return out
