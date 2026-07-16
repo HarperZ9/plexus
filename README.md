@@ -63,6 +63,20 @@ $ plexus route --from gather --to crucible
   [gather -> crucible via gather.digest/1]
 ```
 
+**A plan you can re-verify.** Every `plan` and `route` carries a receipt that binds the
+wiring to the exact manifests it came from: the content hash of every organ, plus a hash
+over the derived plan. Save a plan, and later re-check it against the live mesh:
+
+```
+$ plexus plan --goal crucible --builtin > plan.json
+$ plexus verify --plan plan.json --builtin     # exit 0 if it still holds, 1 if it drifted
+```
+
+`verify` re-derives the plan from the manifests (it never trusts the saved body), so a
+tampered plan is caught, and a tool whose manifest changed since the plan makes the wiring
+drift **visible** instead of letting it silently shift under you. Exit non-zero on drift,
+so it works as a CI gate over your toolchain's wiring.
+
 ## How a tool plugs in
 
 A manifest is plain JSON. A tool ships one and it joins the mesh. Drop

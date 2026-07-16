@@ -9,6 +9,7 @@ from .graph import to_dot, to_mermaid
 from .manifest import Manifest, Port, validate
 from .mesh import Edge, Mesh, discover
 from .plan import plan_to, route
+from .receipt import build_plan_receipt, verify_plan
 from .registry import builtin_manifests, load_dir
 from .run import pipeline_script
 
@@ -18,6 +19,7 @@ __all__ = [
     "Manifest", "Port", "validate",
     "Mesh", "Edge", "discover",
     "plan_to", "route",
+    "build_plan_receipt", "verify_plan",
     "to_mermaid", "to_dot", "pipeline_script",
     "builtin_manifests", "load_dir",
     "__version__",
