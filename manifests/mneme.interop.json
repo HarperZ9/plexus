@@ -35,6 +35,13 @@
       "module": "src/mneme/drift.py:drift_report",
       "summary": "",
       "consumable_as": []
+    },
+    {
+      "capability": "crucible.replay-pack/1",
+      "title": "assessment-bound replay pack",
+      "module": "src/mneme/replay.py:replay_crucible",
+      "summary": "",
+      "consumable_as": []
     }
   ],
   "consumes": [
@@ -51,12 +58,20 @@
       "module": "src/mneme/memory.py:AgentMemory.remember",
       "summary": "",
       "consumable_as": []
+    },
+    {
+      "capability": "crucible.replay-template/1",
+      "title": "oracle replay template",
+      "module": "src/mneme/replay.py:replay_crucible",
+      "summary": "",
+      "consumable_as": []
     }
   ],
   "evidence": [
     "src/mneme/compose.py",
     "src/mneme/ingest.py",
     "src/mneme/receipt.py",
-    "src/mneme/drift.py"
+    "src/mneme/drift.py",
+    "src/mneme/replay.py"
   ]
 }

@@ -16,6 +16,10 @@ where a real check ran; no receipt no accept; the honest null is first-class).
   malformed external manifest (missing organ / capability).
 - `plan_to` marks a hop `runnable: false` and names the absence instead of
   coercing an undeclared CLI into a command.
+- Declare the schema-exact Mneme/Crucible replay loop:
+  `crucible.replay-template/1` routes Crucible→Mneme and
+  `crucible.replay-pack/1` routes Mneme→Crucible, while retaining the existing
+  Mneme→Crucible thesis route.
 
 ## 0.2.0
 

@@ -38,7 +38,11 @@ def main() -> int:
     # smoke assertions so CI catches a broken mesh
     assert mesh.edges, "no edges discovered"
     assert any(e.producer == "mneme" and e.consumer == "crucible" for e in mesh.edges)
-    assert "crucible" in plan["order"] and set(plan["cyclic"]) == {"crucible", "index"}
+    assert "crucible" in plan["order"] and set(plan["cyclic"]) == {
+        "crucible",
+        "index",
+        "mneme",
+    }
     print("\nOK")
     return 0
 
