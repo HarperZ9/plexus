@@ -7,7 +7,8 @@ flagship renames a cited symbol, the manifest here goes stale silently until the
 next manual survey. Capability keys are aligned across producers and consumers so
 a declared edge forms where the code composed at survey time: gather.digest/1 ->
 crucible, gather.items/1 -> mneme, mneme.crucible-export/1 (as crucible.thesis/1)
--> crucible, index.verification/1 -> crucible, and every flagship's
+-> crucible, crucible.replay-template/1 -> mneme,
+crucible.replay-pack/1 -> crucible, index.verification/1 -> crucible, and every flagship's
 project-telos.flagship-action/v1 envelope -> index's spine loader.
 
 External manifests can be loaded from a directory of *.interop.json files with
@@ -57,19 +58,24 @@ _SEED = [
              "module": "src/crucible/measurement_gate.py:_result"},
             {"capability": "crucible.thesis-export/1", "title": "public thesis contract",
              "module": "src/crucible/gate.py:export_thesis"},
+            {"capability": "crucible.replay-template/1", "title": "oracle replay template",
+             "module": "src/crucible/recheck_cmd.py:_write_template"},
         ],
         "consumes": [
             {"capability": "crucible.thesis/1", "title": "thesis JSON",
              "module": "src/crucible/commands.py:_thesis_from_data"},
             {"capability": "crucible.measurements/1", "title": "per-claim measurements",
              "module": "src/crucible/commands.py:_load_measurements"},
+            {"capability": "crucible.replay-pack/1", "title": "assessment-bound replay pack",
+             "module": "src/crucible/recheck_cmd.py:_load_replay_pack"},
             {"capability": "gather.digest/1", "title": "gather digest as evidence",
              "module": "src/crucible/ecosystem_measure.py:GatherDigestMeasure"},
             {"capability": "index.verification/1", "title": "index structural verdict",
              "module": "src/crucible/ecosystem_measure.py:verify_index_verification"},
         ],
         "evidence": ["src/crucible/ecosystem_measure.py", "src/crucible/commands.py",
-                     "src/crucible/assess.py", "src/crucible/gate.py"],
+                     "src/crucible/assess.py", "src/crucible/gate.py",
+                     "src/crucible/recheck_cmd.py"],
     },
     {
         "organ": "forum",
@@ -130,15 +136,20 @@ _SEED = [
              "module": "src/mneme/receipt.py:RecallReceipt.as_dict"},
             {"capability": "mneme.drift-report/1", "title": "memory faithfulness verdicts",
              "module": "src/mneme/drift.py:drift_report"},
+            {"capability": "crucible.replay-pack/1", "title": "assessment-bound replay pack",
+             "module": "src/mneme/replay.py:replay_crucible"},
         ],
         "consumes": [
             {"capability": "gather.items/1", "title": "accountable intake items",
              "module": "src/mneme/ingest.py:from_gather"},
             {"capability": "conversation-turns/1", "title": "raw turns to remember",
              "module": "src/mneme/memory.py:AgentMemory.remember"},
+            {"capability": "crucible.replay-template/1", "title": "oracle replay template",
+             "module": "src/mneme/replay.py:replay_crucible"},
         ],
         "evidence": ["src/mneme/compose.py", "src/mneme/ingest.py",
-                     "src/mneme/receipt.py", "src/mneme/drift.py"],
+                     "src/mneme/receipt.py", "src/mneme/drift.py",
+                     "src/mneme/replay.py"],
     },
 ]
 

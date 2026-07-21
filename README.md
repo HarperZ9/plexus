@@ -44,6 +44,8 @@ and plexus computes the wiring graph: which tool's output is which tool's input.
 ```
 $ plexus wiring --builtin
 {
+  "crucible.replay-pack/1":           [["mneme", "crucible"]],
+  "crucible.replay-template/1":       [["crucible", "mneme"]],
   "crucible.thesis/1":                [["mneme", "crucible"]],
   "gather.digest/1":                  [["gather", "crucible"]],
   "gather.items/1":                   [["gather", "mneme"]],
@@ -52,13 +54,18 @@ $ plexus wiring --builtin
 }
 ```
 
+The Mneme/Crucible replay loop is bidirectional and schema-exact: Crucible emits
+`crucible.replay-template/1` for Mneme to consume, and Mneme emits
+`crucible.replay-pack/1` for Crucible to consume. The existing
+`crucible.thesis/1` Mneme→Crucible route remains a separate declared edge.
+
 **Plan a pipeline.** "I want to feed `crucible`. What produces its inputs?"
 
 ```
 $ plexus plan --goal crucible
-  order:   forum -> gather -> mneme -> crucible -> index
+  order:   forum -> gather -> crucible -> index -> mneme
   sources: forum, gather
-  cyclic:  crucible <-> index      # a real feedback loop, reported not hidden
+  cyclic:  crucible, index, mneme  # both feedback loops, reported not hidden
 ```
 
 **Route between two tools.** "I have `gather` output and want a `crucible`
