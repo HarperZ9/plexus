@@ -49,11 +49,12 @@ def test_plan_to_crucible_pulls_the_upstream_producers():
     assert "gather" in plan["sources"]                       # gather is a pure source
 
 
-def test_the_crucible_index_feedback_loop_is_reported_not_hidden():
+def test_crucible_feedback_loops_with_index_and_mneme_are_reported_not_hidden():
     # crucible's status envelope feeds index's spine; index's verification feeds
-    # crucible's measurement -> a real 2-cycle the planner must surface honestly
+    # crucible's measurement. Its replay template also feeds Mneme, whose replay
+    # pack and thesis both feed Crucible. The planner must surface every member.
     plan = plan_to(_mesh(), "crucible")
-    assert set(plan["cyclic"]) == {"crucible", "index"}
+    assert set(plan["cyclic"]) == {"crucible", "index", "mneme"}
 
 
 def test_route_gather_to_crucible_is_connected():
