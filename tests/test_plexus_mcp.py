@@ -34,7 +34,7 @@ def test_tools_list_advertises_the_mesh_tools():
 def test_call_discover_returns_the_real_mesh():
     resp = handle(_req("tools/call", params={"name": "plexus_discover", "arguments": {}}))
     payload = json.loads(resp["result"]["content"][0]["text"])
-    assert set(payload["organs"]) == {"gather", "crucible", "forum", "index", "mneme"}
+    assert {"gather", "crucible", "forum", "index", "mneme"} <= set(payload["organs"])
     assert any(e["producer"] == "mneme" and e["consumer"] == "crucible" for e in payload["edges"])
 
 

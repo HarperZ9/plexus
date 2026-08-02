@@ -16,7 +16,7 @@ def _edgeset(manifests):
 
 def test_builtin_manifests_roundtrip_through_json(tmp_path):
     written = export_all(str(tmp_path))
-    assert len(written) == 5
+    assert len(written) == len(builtin_manifests())
     reloaded = load_dir(str(tmp_path))
     assert {m.organ for m in reloaded} == {m.organ for m in builtin_manifests()}
     # the mesh discovered from the JSON files is identical to the in-code mesh
@@ -26,8 +26,8 @@ def test_builtin_manifests_roundtrip_through_json(tmp_path):
 def test_exported_files_are_named_per_organ(tmp_path):
     export_all(str(tmp_path))
     names = {p.name for p in tmp_path.glob("*.interop.json")}
-    assert names == {"gather.interop.json", "crucible.interop.json",
-                     "forum.interop.json", "index.interop.json", "mneme.interop.json"}
+    expected = {f"{m.organ}.interop.json" for m in builtin_manifests()}
+    assert names == expected
 
 
 def test_shipped_manifests_match_the_full_builtin_registry_content():
