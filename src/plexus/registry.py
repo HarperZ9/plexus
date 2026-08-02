@@ -164,7 +164,7 @@ _SEED = [
             {"capability": "learn.tutor-misconceptions/1", "title": "ranked misconception aggregation",
              "module": "src/tutor/misconception.mjs:misconceptions"},
             {"capability": FLAGSHIP, "title": "flagship-action envelope",
-             "module": "src/interop.mjs"},
+             "module": "src/interop.mjs:receiptEntry"},
         ],
         "consumes": [
             {"capability": "crucible.thesis/1", "title": "crucible thesis for proof lesson",
@@ -184,11 +184,11 @@ _SEED = [
             {"capability": "telos.status/1", "title": "workbench readiness + next actions",
              "module": "src/telos-mcp.mjs:telos_status"},
             {"capability": FLAGSHIP, "title": "flagship-action envelope",
-             "module": "src/telos-mcp.mjs"},
+             "module": "src/telos-mcp.mjs:telos_status"},
         ],
         "consumes": [
             {"capability": "project-telos.flagship-action/v1", "title": "cross-tool action",
-             "module": "src/telos-mcp.mjs"},
+             "module": "src/telos-mcp.mjs:telos_room"},
         ],
         "evidence": ["demo/telos-mcp.mjs"],
     },

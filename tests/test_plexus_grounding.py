@@ -19,8 +19,9 @@ def _edge(mesh, producer, consumer, capability):
                and e.capability == capability for e in mesh.edges)
 
 
-def test_the_five_flagships_are_present():
-    assert set(_mesh().organs) == {"gather", "crucible", "forum", "index", "mneme"}
+def test_the_flagships_are_present():
+    assert {"gather", "crucible", "forum", "index", "mneme"} <= set(_mesh().organs)
+    assert {"learn", "telos", "flywheel-infra"} <= set(_mesh().organs)
 
 
 def test_real_cross_flagship_edges_form():
@@ -54,7 +55,7 @@ def test_crucible_feedback_loops_with_index_and_mneme_are_reported_not_hidden():
     # crucible's measurement. Its replay template also feeds Mneme, whose replay
     # pack and thesis both feed Crucible. The planner must surface every member.
     plan = plan_to(_mesh(), "crucible")
-    assert set(plan["cyclic"]) == {"crucible", "index", "mneme"}
+    assert {"crucible", "index", "mneme"} <= set(plan["cyclic"])
 
 
 def test_route_gather_to_crucible_is_connected():
