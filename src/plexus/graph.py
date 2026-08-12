@@ -96,12 +96,17 @@ def to_mermaid(mesh: Mesh, *, direction: str = "LR") -> str:
 def to_dot(mesh: Mesh) -> str:
     """A Graphviz DOT digraph."""
     lines = ["digraph plexus {", '  rankdir=LR;', '  node [shape=box];']
+    quote = '\\\"'
     for organ in mesh.organs:
-        lines.append(f'  "{_escape_label(organ, quote="\\\"")}";')
+        label = _escape_label(organ, quote=quote)
+        lines.append(f'  "{label}";')
     for e in mesh.edges:
-        attrs = f'label="{_escape_label(e.capability, quote="\\\"")}"' + (", style=dotted" if e.self_loop else "")
+        capability = _escape_label(e.capability, quote=quote)
+        attrs = f'label="{capability}"' + (", style=dotted" if e.self_loop else "")
+        producer = _escape_label(e.producer, quote=quote)
+        consumer = _escape_label(e.consumer, quote=quote)
         lines.append(
-            f'  "{_escape_label(e.producer, quote="\\\"")}" -> "{_escape_label(e.consumer, quote="\\\"")}" [{attrs}];'
+            f'  "{producer}" -> "{consumer}" [{attrs}];'
         )
     lines.append("}")
     return "\n".join(lines)
