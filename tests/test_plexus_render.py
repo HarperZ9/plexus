@@ -5,6 +5,8 @@ its capability, and marks self-loops distinctly; (2) the pipeline script is a
 runnable, ordered invocation that ends at the target and surfaces feedback loops
 as a comment rather than a false linear order.
 """
+import pytest
+
 from plexus.graph import to_dot, to_mermaid
 from plexus.mesh import Edge, Mesh, discover
 from plexus.registry import builtin_manifests
@@ -51,6 +53,23 @@ def test_render_uses_distinct_ids_for_names_with_the_same_legacy_slug():
     assert len(dot_ids) == len(set(dot_ids)) == 2
 
 
+def test_mermaid_ids_cannot_collide_with_a_raw_name_that_matches_a_generated_id():
+    """Catch an encoded collision id that aliases a separately-declared organ."""
+    mesh = Mesh(
+        organs=["alpha-beta", "alpha_beta", "alpha_beta__616c7068612d62657461"],
+        edges=[],
+        manifests={},
+    )
+
+    node_ids = [
+        line.strip().split("[", 1)[0]
+        for line in to_mermaid(mesh).splitlines()
+        if "[\"" in line
+    ]
+
+    assert len(node_ids) == len(set(node_ids)) == 3
+
+
 def test_render_escapes_hostile_names_and_capabilities_without_new_statements():
     """Catch a raw quote, slash, or control character escaping a graph label."""
     hostile = 'alpha\"]\\\r\nINJECTED --> target\x00\x1f\x7f'
@@ -68,11 +87,49 @@ def test_render_escapes_hostile_names_and_capabilities_without_new_statements():
     # Only the renderer's own statements may occupy physical output lines.
     assert len(mermaid.splitlines()) == 4
     assert len(dot.splitlines()) == 7
+    assert "#quot;" in mermaid and "\\\\" in mermaid
+    assert '\\"' in dot and "\\\\" in dot
     for rendered in (mermaid, dot):
-        assert '\\"' in rendered and "\\\\" in rendered
         assert "\\r" in rendered and "\\n" in rendered
         assert "\\x00" in rendered and "\\x1f" in rendered and "\\x7f" in rendered
         assert '"INJECTED --> target' not in rendered
+
+
+def test_render_escapes_unicode_line_separators():
+    mesh = Mesh(
+        organs=["alpha\u2028beta", "gamma\u2029delta"],
+        edges=[Edge("alpha\u2028beta", "gamma\u2029delta", "cap\u2028\u2029", "a.py", "b.py")],
+        manifests={},
+    )
+
+    for rendered in (to_mermaid(mesh), to_dot(mesh)):
+        assert "\\u2028" in rendered and "\\u2029" in rendered
+        assert "\u2028" not in rendered and "\u2029" not in rendered
+
+
+@pytest.mark.parametrize(
+    "direction",
+    ["TB", "TD", "BT", "RL", "LR"],
+)
+def test_mermaid_accepts_supported_directions(direction):
+    assert to_mermaid(_mesh(), direction=direction).startswith(f"flowchart {direction}")
+
+
+def test_mermaid_rejects_a_direction_that_can_inject_a_statement():
+    with pytest.raises(ValueError, match="direction"):
+        to_mermaid(_mesh(), direction="LR\nINJECTED --> target")
+
+
+def test_render_rejects_oversized_name_and_label_values():
+    oversized = "x" * 4097
+    with pytest.raises(ValueError, match="maximum"):
+        to_mermaid(Mesh(organs=[oversized], edges=[], manifests={}))
+    with pytest.raises(ValueError, match="maximum"):
+        to_dot(Mesh(
+            organs=["source", "target"],
+            edges=[Edge("source", "target", oversized, "a.py", "b.py")],
+            manifests={},
+        ))
 
 
 def test_current_slug_shaped_registry_output_keeps_its_existing_identifiers():
