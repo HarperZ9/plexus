@@ -18,7 +18,8 @@ _MAX_GRAPH_TEXT_LENGTH = 4096
 
 def _san(node: str) -> str:
     """A Mermaid/DOT-safe node id (organs are simple slugs already, but be safe)."""
-    return "".join(c if c.isalnum() else "_" for c in node)
+    identifier = "".join(c if c.isalnum() else "_" for c in node)
+    return "_end" if identifier == "end" else identifier
 
 
 def _bounded(value: str, *, field: str) -> str:
@@ -65,6 +66,8 @@ def _escape_label(value: str, *, quote: str) -> str:
         elif char == "\r":
             escaped.append("\\r")
         elif char in {"\u2028", "\u2029"}:
+            escaped.append(f"\\u{code:04x}")
+        elif 0xD800 <= code <= 0xDFFF:
             escaped.append(f"\\u{code:04x}")
         elif code < 0x20 or 0x7F <= code <= 0x9F:
             escaped.append(f"\\x{code:02x}")

@@ -70,6 +70,33 @@ def test_mermaid_ids_cannot_collide_with_a_raw_name_that_matches_a_generated_id(
     assert len(node_ids) == len(set(node_ids)) == 3
 
 
+def test_mermaid_never_uses_lowercase_end_as_an_internal_id():
+    mesh = Mesh(
+        organs=["end", "target"],
+        edges=[Edge("end", "target", "cap/1", "a.py", "b.py")],
+        manifests={},
+    )
+
+    mermaid = to_mermaid(mesh)
+    end_node = next(line for line in mermaid.splitlines() if '["end"]' in line)
+
+    assert end_node.strip().split("[", 1)[0] != "end"
+    assert end_node.endswith('["end"]')
+
+
+def test_render_escapes_surrogate_code_points_to_utf8_encodable_text():
+    surrogate = "alpha\ud800beta"
+    mesh = Mesh(
+        organs=[surrogate, "target"],
+        edges=[Edge(surrogate, "target", "cap\udfff/1", "a.py", "b.py")],
+        manifests={},
+    )
+
+    for rendered in (to_mermaid(mesh), to_dot(mesh)):
+        assert "\\ud800" in rendered and "\\udfff" in rendered
+        rendered.encode("utf-8")
+
+
 def test_render_escapes_hostile_names_and_capabilities_without_new_statements():
     """Catch a raw quote, slash, or control character escaping a graph label."""
     hostile = 'alpha\"]\\\r\nINJECTED --> target\x00\x1f\x7f'
