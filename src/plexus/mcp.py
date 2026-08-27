@@ -37,6 +37,12 @@ TOOLS = [
      "description": "The shortest capability path from one organ to another.",
      "inputSchema": {"type": "object", "required": ["source", "target"],
                      "properties": {"source": {"type": "string"}, "target": {"type": "string"}, **_DIR}}},
+    {"name": "plexus.status",
+     "description": "Liveness and identity of the plexus MCP server (name, version, protocol). Network-free health probe.",
+     "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "plexus.doctor",
+     "description": "Readiness diagnostic: identity plus the count of builtin interop manifests and the tools exposed.",
+     "inputSchema": {"type": "object", "properties": {}}},
 ]
 
 
@@ -57,6 +63,12 @@ def _mesh_json(mesh) -> dict:
 
 def _call(params: dict) -> dict:
     name, args = params.get("name"), params.get("arguments", {}) or {}
+    if name in ("plexus.status", "plexus.doctor"):
+        info = {"ok": True, "server": "plexus", "version": __version__, "protocol": PROTOCOL}
+        if name == "plexus.doctor":
+            info["builtin_manifests"] = len(list(builtin_manifests()))
+            info["tools"] = [t["name"] for t in TOOLS]
+        return {"content": [{"type": "text", "text": json.dumps(info, indent=2)}]}
     try:
         mesh = _mesh(args)
         if name == "plexus_discover":

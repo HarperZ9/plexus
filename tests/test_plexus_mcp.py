@@ -28,7 +28,8 @@ def test_initialize_reports_the_server():
 
 def test_tools_list_advertises_the_mesh_tools():
     tools = {t["name"] for t in handle(_req("tools/list"))["result"]["tools"]}
-    assert tools == {"plexus_discover", "plexus_wiring", "plexus_plan", "plexus_route"}
+    assert tools == {"plexus_discover", "plexus_wiring", "plexus_plan", "plexus_route",
+                     "plexus.status", "plexus.doctor"}
 
 
 def test_call_discover_returns_the_real_mesh():
@@ -66,3 +67,12 @@ def test_serve_loop_reads_and_writes_jsonrpc():
     lines = [json.loads(x) for x in out.getvalue().splitlines() if x.strip()]
     assert lines[0]["result"]["serverInfo"]["name"] == "plexus"
     assert lines[1]["id"] == 2 and "tools" in lines[1]["result"]
+
+
+def test_status_and_doctor_health_tools():
+    # the Flywheel lane probe marks plexus LIVE only if a status/doctor tool answers
+    for name in ("plexus.status", "plexus.doctor"):
+        r = handle(_req("tools/call", params={"name": name}))
+        body = json.loads(r["result"]["content"][0]["text"])
+        assert body["ok"] is True and body["server"] == "plexus"
+        assert r["result"].get("isError") is not True
