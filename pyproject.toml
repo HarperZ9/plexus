@@ -8,12 +8,12 @@ version = "0.2.0"
 description = "Capability discovery + auto-wiring for agent toolchains: point it at your tools and it discovers what each one emits and consumes, then wires producer to consumer into an executable pipeline, every edge tagged declared and citing the module its producer names. plexus does not probe or run the tools. Zero runtime dependencies."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "LicenseRef-FSL-1.1-MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Zain Dana Harper" }]
 keywords = ["agent-tools", "interop", "mcp", "discovery", "pipeline", "orchestration", "capability-graph"]
 classifiers = [
     "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",

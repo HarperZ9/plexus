@@ -174,7 +174,7 @@ pipeline_script(mesh, "crucible")   # a runnable shell pipeline
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Plexus is fair-source: open to read, run, and build on, with commercial use reserved so the project can fund its own development. See [LICENSE](LICENSE).
 
 ## What this believes
 
