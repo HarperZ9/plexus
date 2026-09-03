@@ -1,4 +1,4 @@
-<p align="center"><img src=".github/assets/zentropy-banner.png" alt="plexus" width="100%"></p>
+<p align="center"><img src="docs/art/plexus-header.svg" alt="plexus: toolchain wiring discovery. Point it at your tools and it computes how they plug together." width="100%"></p>
 
 # plexus
 
@@ -28,6 +28,8 @@ consumable mid-task, not just from a human's terminal.
 
 How it compares to MCP / LangGraph / Dagster / CrewAI: see [COMPARISON.md](COMPARISON.md).
 plexus is the discovery layer that sits *above* an executor, not another executor.
+
+<p align="center"><img src="docs/art/wiring-lane.svg" alt="Eight stages from manifest to verify, ending in still holds or drifted." width="100%"></p>
 
 ## The problem
 
@@ -89,6 +91,12 @@ $ plexus verify --plan plan.json --builtin     # exit 0 if it still holds, 1 if 
 tampered plan is caught, and a tool whose manifest changed since the plan makes the wiring
 drift **visible** instead of letting it silently shift under you. Exit non-zero on drift,
 so it works as a CI check over your toolchain's wiring.
+
+Two things make that check worth running. `verify` rebuilds the receipt from the
+plan it just re-derived, not from the one saved in the file, so editing the saved
+body cannot make it agree with itself. And the receipt carries a method version
+that has to match before anything else is compared, so a plan written by an older
+plexus is reported as failing rather than silently re-interpreted under new rules.
 
 ## How a tool plugs in
 
@@ -170,6 +178,15 @@ plexus is also honest about what does **not** connect:
   linear order.
 - `discover().collisions`: organ ids declared by more than one manifest, named
   rather than silently resolved last-writer-wins.
+
+<p align="center"><img src="docs/art/honesty-lane.svg" alt="Eight stages from a tool set to a report, ending in wired, colliding, or unmet." width="100%"></p>
+
+An unmet input is a capability something consumes that nothing in the set emits,
+and an unconsumed output is the mirror of it. Both fall out of the same
+comparison, so neither is a special case someone remembered to write. The set is
+also exactly what you handed it: plexus reads the manifests present and reasons
+about nothing else, which is why an unmet input means only that no manifest here
+produces it, not that no such tool exists.
 
 ## Receipt
 
