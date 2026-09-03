@@ -160,6 +160,8 @@ for r in results:
 
 ## Declared, not probed
 
+<p align="center"><img src="docs/art/edge-evidence.svg" alt="The six keys plexus discover returns for one wiring edge, one to a row, each with what settled it. Four are computed by discovery: the producing organ, the consuming organ, the capability that matched, and whether both ends are the same organ. One is copied out of a manifest without being read: via, the producer's own pointer at the code behind the port. One is a constant: evidence, always the word declared. The via row is accented, because it is the field that looks like a citation and is the one plexus never follows." width="100%"></p>
+
 Every edge is tagged `evidence: "declared"` and cites the **module** its producer
 names as the source (`file:function`). plexus does not import, resolve, or run
 that pointer, so the citation is a self-reported claim to check, not a verified
