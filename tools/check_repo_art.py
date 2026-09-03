@@ -38,7 +38,7 @@ SCHEMA = "plexus.repo-art/v1"
 # which other gates already cover.
 SHOWN_DIRS = ("docs/art",)
 
-EM_DASH = "—"
+EM_DASH = "\u2014"
 
 
 def _rel(path: Path) -> str:
