@@ -95,18 +95,41 @@ def _err(rid, code, message):
     return {"jsonrpc": "2.0", "id": rid, "error": {"code": code, "message": message}}
 
 
+def _valid_request_id(value) -> bool:
+    return type(value) is str or type(value) is int
+
+
+def _safe_request_id(req: dict):
+    if "id" not in req:
+        return None
+    rid = req["id"]
+    return rid if _valid_request_id(rid) else None
+
+
 def handle(req: dict):
     """Map one JSON-RPC request to a response dict (or None for notifications)."""
-    method, rid = req.get("method"), req.get("id")
+    if not isinstance(req, dict):
+        return _err(None, -32600, "invalid request")
+    rid = _safe_request_id(req)
+    if "id" in req and not _valid_request_id(req["id"]):
+        return _err(None, -32600, "invalid request")
+    if req.get("jsonrpc") != "2.0":
+        return _err(rid, -32600, "invalid request")
+    method = req.get("method")
+    if not isinstance(method, str):
+        return _err(rid, -32600, "invalid request: method must be a string")
+    if "id" not in req:
+        return None
     if method == "initialize":
         return _ok(rid, {"protocolVersion": PROTOCOL, "capabilities": {"tools": {}},
                          "serverInfo": {"name": "plexus", "version": __version__}})
     if method == "tools/list":
         return _ok(rid, {"tools": TOOLS})
     if method == "tools/call":
-        return _ok(rid, _call(req.get("params", {})))
-    if rid is None:                              # a notification (e.g. initialized)
-        return None
+        params = req["params"] if "params" in req else {}
+        if not isinstance(params, dict):
+            return _err(rid, -32602, "invalid params")
+        return _ok(rid, _call(params))
     return _err(rid, -32601, f"method not found: {method}")
 
 
@@ -119,6 +142,8 @@ def serve(stdin=None, stdout=None) -> int:
         try:
             req = json.loads(line)
         except json.JSONDecodeError:
+            stdout.write(json.dumps(_err(None, -32700, "parse error")) + "\n")
+            stdout.flush()
             continue
         resp = handle(req)
         if resp is not None:
