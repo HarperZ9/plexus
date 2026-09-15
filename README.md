@@ -59,7 +59,8 @@ $ plexus wiring --builtin
 The Mneme/Crucible replay loop is bidirectional and schema-exact: Crucible emits
 `crucible.replay-template/1` for Mneme to consume, and Mneme emits
 `crucible.replay-pack/1` for Crucible to consume. The existing
-`crucible.thesis/1` Mneme→Crucible route remains a separate declared edge.
+`crucible.thesis/1` Mneme→Crucible route remains a separate declared edge,
+satisfied by Mneme's native `mneme.crucible-export/2` export.
 
 **Plan a pipeline.** "I want to feed `crucible`. What produces its inputs?"
 
@@ -166,9 +167,11 @@ Every edge is tagged `evidence: "declared"` and cites the **module** its produce
 names as the source (`file:function`). plexus does not import, resolve, or run
 that pointer, so the citation is a self-reported claim to check, not a verified
 receipt. The built-in manifests for the five flagships (gather, crucible, forum,
-index, mneme) were transcribed by hand from a one-time source survey (2026-07-07);
-the running tool re-checks none of it, so treat every edge as declared until you
-follow the pointer yourself.
+index, mneme) began as a hand transcription from a source survey; the running
+tool re-checks none of it, so treat every edge as declared until you follow the
+pointer yourself. Mneme's contract was refreshed from public main on
+2026-09-14, including `mneme.crucible-export/2` and
+`mneme.local-origin-recheck/1`.
 
 plexus is also honest about what does **not** connect:
 

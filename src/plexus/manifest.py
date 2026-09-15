@@ -3,7 +3,7 @@
 A manifest is a tool's interop contract: the capabilities it EMITS (re-checkable
 artifacts another tool could consume) and the capabilities it CONSUMES (inputs it
 accepts). A capability is a stable string: a schema id like
-"mneme.crucible-export/1" or a shared-spine kind like
+"mneme.crucible-export/2" or a shared-spine kind like
 "project-telos.flagship-action/v1". Matching is by capability string, so an edge
 forms when a producer DECLARES a capability the consumer DECLARES it accepts.
 
@@ -28,7 +28,7 @@ class Port:
     module: str = ""                # evidence: repo-relative file:function
     summary: str = ""
     consumable_as: tuple = ()       # extra capabilities an EMIT also satisfies
-                                    # (e.g. mneme.crucible-export/1 -> crucible.thesis)
+                                    # (e.g. mneme.crucible-export/2 -> crucible.thesis)
 
     def satisfies(self, capability: str) -> bool:
         return capability == self.capability or capability in self.consumable_as
