@@ -4,9 +4,10 @@ Each capability key and module pointer below was transcribed by hand from the
 flagship source during a 2026-07-07 survey. plexus does not re-read that source
 at runtime, so these pointers are DECLARED citations, not probed receipts: if a
 flagship renames a cited symbol, the manifest here goes stale silently until the
-next manual survey. Capability keys are aligned across producers and consumers so
+next manual survey. The Mneme contract was refreshed from public main on
+2026-09-14. Capability keys are aligned across producers and consumers so
 a declared edge forms where the code composed at survey time: gather.digest/1 ->
-crucible, gather.items/1 -> mneme, mneme.crucible-export/1 (as crucible.thesis/1)
+crucible, gather.items/1 -> mneme, mneme.crucible-export/2 (as crucible.thesis/1)
 -> crucible, crucible.replay-template/1 -> mneme,
 crucible.replay-pack/1 -> crucible, index.verification/1 -> crucible, and every flagship's
 project-telos.flagship-action/v1 envelope -> index's spine loader.
@@ -127,29 +128,37 @@ _SEED = [
         "organ": "mneme",
         "invoke": {"cli": "mneme", "mcp_server": "mneme.mcp:serve", "python_import": "mneme"},
         "emits": [
-            {"capability": "mneme.crucible-export/1", "title": "memory as crucible thesis",
+            {"capability": "mneme.crucible-export/2", "title": "memory as crucible thesis",
              "module": "src/mneme/compose.py:to_crucible_thesis",
+             "summary": "claims, drift measurements, and declarative mneme.recheck/1 descriptors",
              "consumable_as": ["crucible.thesis/1"]},
+            {"capability": "crucible.replay-pack/1", "title": "assessment-bound Mneme drift replay",
+             "module": "src/mneme/replay.py:replay_crucible",
+             "summary": "replays descriptor-bound measurements without importing Crucible or executing commands"},
+            {"capability": "mneme.local-origin-recheck/1", "title": "supported local origin freshness report",
+             "module": "src/mneme/origin.py:recheck_local_origins",
+             "summary": "explicit read-only local docs/file-read freshness checks under a caller-approved root"},
             {"capability": "mneme.provenance-chain/1", "title": "memory -> source origin",
-             "module": "src/mneme/ingest.py:provenance_chain"},
+             "module": "src/mneme/ingest.py:provenance_chain",
+             "summary": "memory-to-origin receipt chain; external freshness is checked separately when supported"},
             {"capability": "mneme.recall/1", "title": "re-derivable recall receipt",
              "module": "src/mneme/receipt.py:RecallReceipt.as_dict"},
             {"capability": "mneme.drift-report/1", "title": "memory faithfulness verdicts",
              "module": "src/mneme/drift.py:drift_report"},
-            {"capability": "crucible.replay-pack/1", "title": "assessment-bound replay pack",
-             "module": "src/mneme/replay.py:replay_crucible"},
         ],
         "consumes": [
             {"capability": "gather.items/1", "title": "accountable intake items",
              "module": "src/mneme/ingest.py:from_gather"},
             {"capability": "conversation-turns/1", "title": "raw turns to remember",
              "module": "src/mneme/memory.py:AgentMemory.remember"},
-            {"capability": "crucible.replay-template/1", "title": "oracle replay template",
-             "module": "src/mneme/replay.py:replay_crucible"},
+            {"capability": "crucible.replay-template/1", "title": "assessment-bound measurement replay template",
+             "module": "src/mneme/replay.py:replay_crucible",
+             "summary": "decoded Crucible template plus an explicitly supplied Mneme state"},
         ],
         "evidence": ["src/mneme/compose.py", "src/mneme/ingest.py",
-                     "src/mneme/receipt.py", "src/mneme/drift.py",
-                     "src/mneme/replay.py"],
+                     "src/mneme/origin.py", "src/mneme/receipt.py",
+                     "src/mneme/drift.py", "src/mneme/replay.py",
+                     "tests/test_crucible_replay.py"],
     },
     {
         "organ": "learn",

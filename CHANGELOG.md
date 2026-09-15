@@ -20,6 +20,10 @@ where a real check ran; no receipt no accept; the honest null is first-class).
   `crucible.replay-template/1` routes Crucible→Mneme and
   `crucible.replay-pack/1` routes Mneme→Crucible, while retaining the existing
   Mneme→Crucible thesis route.
+- Refresh the Mneme declarations from public main: the native Crucible export is
+  `mneme.crucible-export/2`, still consumable as `crucible.thesis/1`, and Mneme
+  also declares `mneme.local-origin-recheck/1` as a terminal read-only freshness
+  report capability.
 
 ## 0.2.0
 
