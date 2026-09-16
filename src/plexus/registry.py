@@ -1,16 +1,18 @@
 """registry.py — the built-in manifests, transcribed from a one-time code survey.
 
 Each capability key and module pointer below was transcribed by hand from the
-flagship source during a 2026-07-07 survey. plexus does not re-read that source
+flagship source during public-source surveys. plexus does not re-read that source
 at runtime, so these pointers are DECLARED citations, not probed receipts: if a
 flagship renames a cited symbol, the manifest here goes stale silently until the
 next manual survey. The Mneme contract was refreshed from public main on
-2026-09-14. Capability keys are aligned across producers and consumers so
+2026-09-14. The Canon and Relay contracts were added from public origin/main on
+2026-09-16. Capability keys are aligned across producers and consumers so
 a declared edge forms where the code composed at survey time: gather.digest/1 ->
 crucible, gather.items/1 -> mneme, mneme.crucible-export/2 (as crucible.thesis/1)
 -> crucible, crucible.replay-template/1 -> mneme,
-crucible.replay-pack/1 -> crucible, index.verification/1 -> crucible, and every flagship's
-project-telos.flagship-action/v1 envelope -> index's spine loader.
+crucible.replay-pack/1 -> crucible, index.verification/1 -> crucible, and
+project-telos.flagship-action/v1 envelopes from the organs that declare them ->
+index's spine loader.
 
 External manifests can be loaded from a directory of *.interop.json files with
 the same shape (see Manifest.to_dict), so a tool ships its own contract.
@@ -161,6 +163,81 @@ _SEED = [
                      "tests/test_crucible_replay.py"],
     },
     {
+        "organ": "canon",
+        "invoke": {"cli": "canon", "mcp_server": "canon.local_mcp:serve", "python_import": "canon"},
+        "emits": [
+            {"capability": "canon.record/v1", "title": "provider-neutral context record",
+             "module": "src/canon/schema.py:Record.to_dict",
+             "summary": "one typed envelope for personality blocks, memories, personas, decisions, and research references"},
+            {"capability": "canon.capsule/v1", "title": "continuity capsule",
+             "module": "src/canon/capsule_build.py:compile_capsule",
+             "summary": "explicit records.jsonl and atoms.jsonl compile into capsule JSON, Canon Markdown, and readiness artifacts"},
+            {"capability": "canon.readiness-probe/1", "title": "capsule readiness probe",
+             "module": "src/canon/readiness.py:ReadinessProbe.to_dict",
+             "summary": "target acknowledgement challenge bound to one compiled capsule"},
+            {"capability": "canon.bootstrap-witness/1", "title": "context bootstrap witness",
+             "module": "src/canon/witness.py:BootstrapWitness.to_dict",
+             "summary": "records source state, capsule identity, readiness outcome, and does-not-prove limits"},
+            {"capability": "canon.local-mcp-readonly/1", "title": "read-only Canon MCP surface",
+             "module": "src/canon/local_mcp.py:TOOLS",
+             "summary": "status, doctor, blocks, render, validate, and check; this server writes no files"},
+        ],
+        "consumes": [
+            {"capability": "canon.record/v1", "title": "validated records from explicit source files",
+             "module": "src/canon/bootstrap_runtime_inputs.py:_records_from_source",
+             "summary": "JSONL records are parsed and validated before capsule compile or bootstrap"},
+            {"capability": "canon.atom/v1", "title": "validated bootstrap atoms from explicit source files",
+             "module": "src/canon/bootstrap_runtime_inputs.py:_atoms_from_source",
+             "summary": "JSONL atoms are parsed and validated before capsule compile or bootstrap"},
+            {"capability": "canon.readiness-response/1", "title": "host readiness response",
+             "module": "src/canon/readiness.py:evaluate_readiness_response",
+             "summary": "an optional host response is evaluated against the probe; absent response is reported as unknown"},
+            {"capability": "canon.capsule/v1", "title": "capsule Markdown carrier verification",
+             "module": "src/canon/canonmd.py:verify_canon_md",
+             "summary": "re-renders the embedded carrier capsule and reports drift or mismatch"},
+        ],
+        "evidence": ["README.md", "pyproject.toml", "src/canon/schema.py",
+                     "src/canon/local_mcp.py", "src/canon/capsule_build.py",
+                     "src/canon/bootstrap_runtime_inputs.py", "src/canon/readiness.py",
+                     "src/canon/witness.py", "src/canon/canonmd.py"],
+    },
+    {
+        "organ": "relay",
+        "invoke": {"cli": "relay", "mcp_server": "relay.local_mcp:serve", "python_import": "relay"},
+        "emits": [
+            {"capability": "relay.endpoint-ladder/1", "title": "local and online endpoint ladder",
+             "module": "src/relay/endpoints.py:build_endpoints",
+             "summary": "configured provider/API/gateway/cloud rungs are built only from caller-supplied environment"},
+            {"capability": "relay.agent-run-result/1", "title": "gated agent run result",
+             "module": "src/relay/local_loop.py:run_agent",
+             "summary": "final answer, checkpoint, verification fields, acceptance check, reviewability, and observed route"},
+            {"capability": "relay.session-ledger/1", "title": "hash-chained session ledger",
+             "module": "src/relay/local_session.py:SessionLedger.to_jsonl",
+             "summary": "append-only run/session trajectory that re-verifies on load"},
+            {"capability": "relay.rvc/v1", "title": "Relay-Verified-Correctness certificate",
+             "module": "src/relay/cert.py:emit_cert",
+             "summary": "self-contained certificate embedding a witnessed ledger and typed acceptance contract"},
+            {"capability": "relay.remote-mcp/1", "title": "remote MCP endpoint",
+             "module": "src/relay/remote_mcp.py:process",
+             "summary": "Streamable HTTP MCP endpoint with bearer/OAuth authorization and remote exec forced off unless opted in"},
+        ],
+        "consumes": [
+            {"capability": "relay.mcp-run-request/v1", "title": "bounded MCP run request",
+             "module": "src/relay/local_mcp.py:_request_binding",
+             "summary": "binds goal, root, backend/model hints, write/exec gates, checks, and compaction budget"},
+            {"capability": "relay.rvc/v1", "title": "offline certificate verification",
+             "module": "src/relay/cert.py:verify_cert",
+             "summary": "re-derives ALLOW, UNVERIFIABLE, or REFUTED from the embedded ledger and contract"},
+            {"capability": "relay.session-ledger/1", "title": "saved session listing and reopening",
+             "module": "src/relay/session_store.py:get_session",
+             "summary": "saved ledgers are listed, reloaded, and re-verified from RELAY_SESSION_DIR"},
+        ],
+        "evidence": ["README.md", "pyproject.toml", "src/relay/endpoints.py",
+                     "src/relay/local_mcp.py", "src/relay/local_loop.py",
+                     "src/relay/local_session.py", "src/relay/session_store.py",
+                     "src/relay/cert.py", "src/relay/remote_mcp.py"],
+    },
+    {
         "organ": "learn",
         "invoke": {"cli": "learn", "mcp_server": "src/mcp.mjs", "node_entry": "src/mcp.mjs"},
         "emits": [
@@ -247,7 +324,8 @@ _SEED = [
 def builtin_manifests() -> list:
     """The built-in flagship manifests, tagged with their in-code source.
 
-    Covers: gather, crucible, index, forum, mneme, learn, telos, flywheel-infra.
+    Covers: gather, crucible, index, forum, mneme, canon, relay, learn, telos,
+    flywheel-infra.
     """
     out = []
     for d in _SEED:

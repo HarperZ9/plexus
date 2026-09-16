@@ -5,9 +5,9 @@ from plexus.registry import builtin_manifests, probe_all, probe_lane
 
 
 def test_builtin_manifests_count():
-    """Should now have 8 manifests (5 original + learn + telos + flywheel-infra)."""
+    """Should now have 10 manifests (8 prior + canon + relay)."""
     manifests = builtin_manifests()
-    assert len(manifests) == 8
+    assert len(manifests) == 10
 
 
 def test_learn_manifest_present():
@@ -26,6 +26,18 @@ def test_flywheel_infra_manifest_present():
     manifests = builtin_manifests()
     organs = [m.organ for m in manifests]
     assert "flywheel-infra" in organs
+
+
+def test_canon_manifest_present():
+    manifests = builtin_manifests()
+    organs = [m.organ for m in manifests]
+    assert "canon" in organs
+
+
+def test_relay_manifest_present():
+    manifests = builtin_manifests()
+    organs = [m.organ for m in manifests]
+    assert "relay" in organs
 
 
 def test_learn_manifest_emits():
