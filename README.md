@@ -9,9 +9,100 @@ to consumer into a runnable pipeline. Zero runtime dependencies.
 MCP tells an agent *that tools exist*. plexus tells it *how their outputs plug
 into each other's inputs*: the layer above a flat tool list.
 
+GitHub-only release install for 0.2.1 on Bash/macOS/Linux:
+
+```bash
+set -euo pipefail
+VERSION=0.2.1
+BASE="https://github.com/HarperZ9/plexus/releases/download/v0.2.1"
+WHEEL="plexus_mesh-${VERSION}-py3-none-any.whl"
+SDIST="plexus_mesh-${VERSION}.tar.gz"
+SUMS="SHA256SUMS.txt"
+curl -fL -o "$WHEEL" "${BASE}/${WHEEL}"
+curl -fL -o "$SDIST" "${BASE}/${SDIST}"
+curl -fL -o "$SUMS" "${BASE}/${SUMS}"
+python - "$WHEEL" "$SDIST" "$SUMS" <<'PY'
+import hashlib
+import re
+import sys
+from pathlib import Path
+
+required = list(sys.argv[1:3])
+sums = Path(sys.argv[3])
+expected = {}
+for line_number, raw_line in enumerate(sums.read_text(encoding="utf-8").splitlines(), 1):
+    line = raw_line.strip()
+    if not line:
+        continue
+    parts = line.split(maxsplit=1)
+    if len(parts) != 2:
+        raise SystemExit(f"malformed checksum line {line_number}")
+    digest, name = parts[0].lower(), parts[1].lstrip("*")
+    if not re.fullmatch(r"[0-9a-f]{64}", digest):
+        raise SystemExit(f"invalid checksum for {name}")
+    if Path(name).name != name:
+        raise SystemExit(f"unexpected checksum path: {name}")
+    if name not in required:
+        raise SystemExit(f"unexpected checksum entry: {name}")
+    if name in expected:
+        raise SystemExit(f"duplicate checksum entry: {name}")
+    expected[name] = digest
+missing = [name for name in required if name not in expected]
+if missing:
+    raise SystemExit(f"missing checksum entry: {', '.join(missing)}")
+for name in required:
+    got = hashlib.sha256(Path(name).read_bytes()).hexdigest()
+    if got != expected[name]:
+        raise SystemExit(f"{name}: expected {expected[name]}, got {got}")
+PY
+python -m pip install "$WHEEL"
 ```
-pip install git+https://github.com/HarperZ9/plexus.git
+
+GitHub-only release install for 0.2.1 on native PowerShell:
+
+```powershell
+& {
+    $ErrorActionPreference = "Stop"
+    $Version = "0.2.1"
+    $Base = "https://github.com/HarperZ9/plexus/releases/download/v0.2.1"
+    $Wheel = "plexus_mesh-$Version-py3-none-any.whl"
+    $Sdist = "plexus_mesh-$Version.tar.gz"
+    $Sums = "SHA256SUMS.txt"
+    $Files = @($Wheel, $Sdist, $Sums)
+    foreach ($Name in $Files) {
+        Invoke-WebRequest -Uri "$Base/$Name" -OutFile $Name
+    }
+    $Required = @($Wheel, $Sdist)
+    $Expected = @{}
+    $LineNumber = 0
+    Get-Content -LiteralPath $Sums | ForEach-Object {
+        $LineNumber += 1
+        $Line = $_.Trim()
+        if (-not $Line) { return }
+        $Parts = $Line -split '\s+', 2
+        if ($Parts.Count -ne 2) { throw "malformed checksum line $LineNumber" }
+        $Digest = $Parts[0].ToLowerInvariant()
+        $Name = $Parts[1].TrimStart("*")
+        if ($Digest -notmatch '^[0-9a-f]{64}$') { throw "invalid checksum for $Name" }
+        if ([IO.Path]::GetFileName($Name) -ne $Name) { throw "unexpected checksum path: $Name" }
+        if ($Required -notcontains $Name) { throw "unexpected checksum entry: $Name" }
+        if ($Expected.ContainsKey($Name)) { throw "duplicate checksum entry: $Name" }
+        $Expected[$Name] = $Digest
+    }
+    foreach ($Name in $Required) {
+        if (-not $Expected.ContainsKey($Name)) { throw "missing checksum entry: $Name" }
+        $Got = (Get-FileHash -Algorithm SHA256 -Path $Name).Hash.ToLowerInvariant()
+        if ($Got -ne $Expected[$Name]) {
+            throw "${Name}: expected $($Expected[$Name]), got $Got"
+        }
+    }
+    python -m pip install $Wheel
+}
 ```
+
+`plexus-mesh` is not published on PyPI in this release track. A source branch or
+CI run is not a release; install from the GitHub `v0.2.1` assets only after the
+wheel, sdist, and `SHA256SUMS.txt` are attached to that release.
 
 ```
 $ plexus discover --builtin
@@ -127,8 +218,7 @@ A manifest is plain JSON. A tool ships one and it joins the mesh. Drop
 An edge `A -> B` forms when `B` consumes a capability that `A` emits (directly,
 or via `consumable_as`, the way a producer declares "my output is also
 consumable as X"). Matching is by capability string, so an edge exists wherever
-the tools DECLARE compatible capabilities. plexus does not run the tools, so the
-edge is a declared claim, not a probed result.
+the tools DECLARE compatible capabilities. Declarative discovery does not run the tools, so the edge is a declared claim, not a probed result.
 
 Plexus commits the built-in registry's exported JSON manifests under
 [`manifests/`](manifests/). Discovery from these Plexus-side files produces the
@@ -185,9 +275,9 @@ for r in results:
 <p align="center"><img src="docs/art/edge-evidence.svg" alt="The six keys plexus discover returns for one wiring edge, one to a row, each with what settled it. Four are computed by discovery: the producing organ, the consuming organ, the capability that matched, and whether both ends are the same organ. One is copied out of a manifest without being read: via, the producer's own pointer at the code behind the port. One is a constant: evidence, always the word declared. The via row is accented, because it is the field that looks like a citation and is the one plexus never follows." width="100%"></p>
 
 Every edge is tagged `evidence: "declared"` and cites the **module** its producer
-names as the source (`file:function`). plexus does not import, resolve, or run
-that pointer, so the citation is a self-reported claim to check, not a verified
-receipt. The running tool re-checks none of the built-in manifests, so treat
+names as the source (`file:function`). Declarative discovery does not import,
+resolve, or run that pointer, so the citation is a self-reported claim to check,
+not a verified receipt. The running tool re-checks none of the built-in manifests, so treat
 every edge as declared until you follow the pointer yourself. Mneme's contract
 was refreshed from public main on 2026-09-14, including
 `mneme.crucible-export/2` and `mneme.local-origin-recheck/1`. Canon and Relay
@@ -226,8 +316,14 @@ mesh to exactly the manifests that produced it.
 ## Install
 
 ```
-pip install git+https://github.com/HarperZ9/plexus.git
+python -m pip install plexus_mesh-0.2.1-py3-none-any.whl
 ```
+
+Use the GitHub release asset and verify it against `SHA256SUMS.txt` first. This
+repository does not claim a PyPI publication for `plexus-mesh` in the 0.2.1
+track. The installed package covers declared and synthetic mesh workflows; it
+does not prove that real external lanes are live or that `probe_lane()` has been
+run against owned services.
 
 ## Library
 

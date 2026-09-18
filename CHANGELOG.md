@@ -2,12 +2,17 @@
 
 ## Unreleased
 
+No changes yet after the 0.2.1 release-prep branch.
+
+## 0.2.1
+
 Honesty repairs to the wiring surface (the credo: color/verdict vocabulary only
 where a real check ran; no receipt no accept; the honest null is first-class).
 
-- Edges are DECLARED, not probed: plexus never imports, resolves, or runs the
-  tools, so each edge is tagged `evidence: "declared"` and the "grounded, not
-  asserted" / "traces back to real code" / "genuinely compose" wording is gone.
+- Edges are DECLARED, not probed: declarative discovery never imports,
+  resolves, or runs the cited tools, so each edge is tagged
+  `evidence: "declared"` and the "grounded, not asserted" / "traces back to
+  real code" / "genuinely compose" wording is gone.
 - Duplicate organ ids are NAMED (`discover().collisions`, `validate` reports
   `duplicate_organs` and exits 1) instead of collapsing last-writer-wins.
 - `discover` stamps a re-runnable `receipt`: plexus version, UTC timestamp, and
@@ -24,6 +29,11 @@ where a real check ran; no receipt no accept; the honest null is first-class).
   `mneme.crucible-export/2`, still consumable as `crucible.thesis/1`, and Mneme
   also declares `mneme.local-origin-recheck/1` as a terminal read-only freshness
   report capability.
+- Add Canon and Relay to the declared capability catalog from public
+  origin-main source, with repo-relative public paths and no live external lane probing by Plexus.
+- Keep this release on the GitHub-asset track: wheel, sdist, and
+  `SHA256SUMS.txt` are reviewable release assets, while PyPI publication remains
+  outside this patch.
 
 ## 0.2.0
 
