@@ -1,9 +1,10 @@
 """plexus: capability discovery + auto-wiring for agent toolchains.
 
-Point it at a set of tools that ship interop manifests and it discovers what each
-one emits and consumes, then wires producer to consumer into a pipeline, every
-edge tagged `declared` and carrying the module its producer names. plexus does
-not import, probe, or run those tools. Zero runtime dependencies.
+Point it at a set of tools that ship interop manifests and declarative discovery
+wires producer to consumer into a pipeline, every edge tagged `declared` and
+carrying the module its producer names. Discovery does not import or run cited
+tools. Optional probe helpers in `plexus.registry` launch owned MCP servers only
+when explicitly called. Zero runtime dependencies.
 """
 from .graph import to_dot, to_mermaid
 from .manifest import Manifest, Port, validate
@@ -13,7 +14,7 @@ from .receipt import build_plan_receipt, verify_plan
 from .registry import builtin_manifests, load_dir
 from .run import pipeline_script
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "Manifest", "Port", "validate",
