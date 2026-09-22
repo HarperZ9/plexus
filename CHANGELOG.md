@@ -1,8 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.2.2 - 2026-09-22
 
-No changes yet after the 0.2.1 release-prep branch.
+- Adds an OIDC trusted-publishing release workflow. No token is stored anywhere.
+  A tag builds the sdist and wheel, checks the tag against the declared version,
+  records artifact digests in the run log, installs the wheel into a clean venv
+  and resolves every console script, then rebuilds a wheel from the sdist before
+  anything is published.
+- Publishes to PyPI as `plexus-mesh`. The console script stays `plexus`. No
+  runtime behavior changed in this release.
 
 ## 0.2.1
 
