@@ -14,7 +14,7 @@ from .receipt import build_plan_receipt, verify_plan
 from .registry import builtin_manifests, load_dir
 from .run import pipeline_script
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 __all__ = [
     "Manifest", "Port", "validate",
