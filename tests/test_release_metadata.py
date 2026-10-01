@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.2.2"
+VERSION = "0.3.0"
 
 
 def test_release_identity_is_aligned():
@@ -27,7 +27,7 @@ def test_install_docs_are_github_only_and_hash_verified():
     assert "SHA256SUMS.txt" in readme
     assert "Get-FileHash -Algorithm SHA256" in readme
     assert "Invoke-WebRequest" in readme
-    assert "not published on PyPI" in readme
+    assert "`plexus-mesh` 0.2.2 is published on PyPI" in readme
     assert "pip install git+https://github.com/HarperZ9/plexus.git" not in readme
 
 
