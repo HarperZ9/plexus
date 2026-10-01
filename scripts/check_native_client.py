@@ -56,7 +56,9 @@ def check(executable, version):
         bad=subprocess.run([str(executable),'--grant-all'],capture_output=True,env=env,cwd=temp,timeout=45)
         if not bad.returncode or bad.stdout:
             raise ValueError('unknown launch argument accepted')
-    return {'status':'PASS','version':version,'executable_sha256':hashlib.sha256(Path(executable).read_bytes()).hexdigest(),
+        from check_native_workflow import check_workflow
+        workflow = check_workflow(executable, Path(temp), env)
+    return {'workflow':workflow,'status':'PASS','version':version,'executable_sha256':hashlib.sha256(Path(executable).read_bytes()).hexdigest(),
             'scope':'identity, tool list, unknown tool, default permission refusal',
             'does_not_prove':['model workflow','installed client compatibility','clean OS compatibility']}
 
