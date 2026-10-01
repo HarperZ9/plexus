@@ -102,6 +102,8 @@ jobs:
           # PEP 740 attestations: the index records who built these bytes and
           # from which workflow, verifiable without trusting us.
           attestations: true
+          # Tag publication and the subsequent GitHub Release run the same build.
+          skip-existing: true
 
   client-packages:
     runs-on: windows-latest
