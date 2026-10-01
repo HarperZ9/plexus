@@ -1,0 +1,56 @@
+{
+  "asset_name": "plexus-0.3.0-source-plugin.zip",
+  "asset_sha256": "51c2c6ee4375a2c112a7b2ca8cf3ea3aa1bba5f2868aa8db42489794a9a4f22f",
+  "asset_url": "https://github.com/HarperZ9/plexus/releases/download/v0.3.0/plexus-0.3.0-source-plugin.zip",
+  "checksum_asset": "SOURCE-SHA256SUMS",
+  "checksum_sha256": "b360f1e1f5b96171a62365d6c6c51b38ffbe01763769db68caa3b479a499346b",
+  "does_not_prove": [
+    "marketplace approval",
+    "model quality",
+    "universal client compatibility",
+    "runtime availability on user devices"
+  ],
+  "edition": "source-runtime-required",
+  "native_download_url": "https://github.com/HarperZ9/plexus/releases/download/v0.3.0/plexus-0.3.0-win-x64.mcpb",
+  "original_payload_sha256": {
+    ".claude-plugin/plugin.json": "0f0754e68ab27834e4e85be5d9623521450cda2a79a182c8a9730f76049a3878",
+    ".codex-plugin/plugin.json": "e1e9d010efb3b4e6b5fef1ee06649d42894a8ce3831962c86e7778aeff98f331",
+    ".mcp.json": "f0ce2cf0b04d4c98528c7d46466e966922ec69a7dc3ab165e8080f150f5ba209",
+    "LICENSE": "bf9819be760200cc89a602f0bdbd783b1361666f3747b3787159a15921ee6641",
+    "PAYLOAD-SHA256SUMS": "95251ca3c8fd42a3d9d0e5d0f79363ff9f21e04decab108cb4f5f766d1fcfa8d",
+    "PRIVACY.md": "07a675122f01c3bc98ccb1e7d0672263950bf27f9e9f9f273af8b3646ce326ca",
+    "QUALIFICATION.json": "1652d656e2d9beb3cfcb91a5bf76a94a16101926b4c2f62c9a285ef85e76bd74",
+    "README.md": "550711809ab1f5ad74a04998d45daf291511c707d785ad34feba252cb3c24556",
+    "mcp.json": "85e8846d21747769e1bcab29b66e8391317dbeb6610eec5d8abf67c91d2228c9",
+    "plugin.json": "0f0754e68ab27834e4e85be5d9623521450cda2a79a182c8a9730f76049a3878",
+    "server/serve.py": "5fe9bbea4bb527c7fbd790b44e2c06a9c665733519431cf914643ed517986322",
+    "server/src/plexus/__init__.py": "723284d327421d601501f743c3d607320909c5529729173e846a6cef5d88e9b9",
+    "server/src/plexus/__main__.py": "080d852b9e90e528dd7af540f3698a713479f8f74e8361cf5a7f9b03dba6198f",
+    "server/src/plexus/cli.py": "b52067225c26fab7868eb64a657b91b72cc57362a262d6894d51c9c475089347",
+    "server/src/plexus/graph.py": "b6ee90df23088109ae42995d52a948fbbaa267031a673fe156439cf620d09a22",
+    "server/src/plexus/manifest.py": "34206622e937c3e8484c8804d8230e34bb2fa3484cbee1ea842f03563d2d2a14",
+    "server/src/plexus/mcp.py": "cf38c0dea946831cc1de40a80c2aeacf62760df6b86ef7970872f4c48869eb4b",
+    "server/src/plexus/mesh.py": "bc2ea1ce475b28a2150bda0dbe21e5826b8b1db8e643b1c6fc0b7035907ed19f",
+    "server/src/plexus/plan.py": "0a56eafc6d5fcd66136753b5c507893f6ca8c6577b7c48b4f9bc7434230a97b5",
+    "server/src/plexus/receipt.py": "4e67cd67c195a02fe4511d967a257307d63541ae6582c07ed46deec880d0717b",
+    "server/src/plexus/registry.py": "39bc6e2cc3a7bcfaff56df0d687f86cbf930e0836b9ef8169ba2c59229ab0c3a",
+    "server/src/plexus/run.py": "b9cbdeb1a89a95bb28e3297296f3edcf01088751a717d5a3e4ed2ff7c8029834",
+    "skills/plexus/SKILL.md": "03dc8d6f5f43eb70cb5ebf98fa9d66e6d9835587a17a4ee3c973fa2c876db3a6"
+  },
+  "packaging_changes": {
+    ".claude-plugin/marketplace.json": {
+      "distribution_sha256": "98f257cafe1254d2ef2e92bc7c0d6dc79d3a5b62cde3386cdf017cd21b0c11ba",
+      "original_sha256": null
+    },
+    "README.md": {
+      "distribution_sha256": "bd4dad974d07a512abf1ace33fe60168d3a9609ba675b25d31c5e57c58f8820e",
+      "original_sha256": "550711809ab1f5ad74a04998d45daf291511c707d785ad34feba252cb3c24556"
+    }
+  },
+  "product": "plexus",
+  "release_url": "https://github.com/HarperZ9/plexus/releases/tag/v0.3.0",
+  "runtime_requirement": "Python 3.11 or later, available as `python3`",
+  "schema": "marketplace-source-distribution/v1",
+  "source_release_commit": "825b992c51e9eac749c046e9c896c251d37017a7",
+  "version": "0.3.0"
+}

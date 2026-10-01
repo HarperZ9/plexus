@@ -1,0 +1,14 @@
+{
+  "description": "Plexus local tools with explicit operator bindings.",
+  "name": "plexus-local",
+  "owner": {
+    "name": "Zain Dana Harper"
+  },
+  "plugins": [
+    {
+      "description": "Plexus local tools with explicit operator bindings.",
+      "name": "plexus-local",
+      "source": "./"
+    }
+  ]
+}

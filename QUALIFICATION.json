@@ -1,0 +1,38 @@
+{
+  "does_not_prove": [
+    "installed client acceptance",
+    "marketplace admission",
+    "clean OS compatibility"
+  ],
+  "head": "825b992c51e9eac749c046e9c896c251d37017a7",
+  "source_sha256": {
+    "LICENSE": "bf9819be760200cc89a602f0bdbd783b1361666f3747b3787159a15921ee6641",
+    "client-plugin/.claude-plugin/plugin.json": "980662e9b64f99c42da5e8ced73281a6d05574a314911b12839b4b2c9ccc6c94",
+    "client-plugin/.codex-plugin/plugin.json": "89596ba3dbd796b4a36be2910a71a4683e694ded448360c07dcfd40ff1d7c0fa",
+    "client-plugin/.mcp.json": "f96efa9ba07f1b1e1249bedfb6293e9590a44b6fc7eb69371489712b9dad6a15",
+    "client-plugin/PRIVACY.md": "07a675122f01c3bc98ccb1e7d0672263950bf27f9e9f9f273af8b3646ce326ca",
+    "client-plugin/README.md": "550711809ab1f5ad74a04998d45daf291511c707d785ad34feba252cb3c24556",
+    "client-plugin/mcp.json": "63e9cb2773f3450b597739f8f1a3b18d70288c4eafb196d70840c8dc97fc44d6",
+    "client-plugin/plugin.json": "980662e9b64f99c42da5e8ced73281a6d05574a314911b12839b4b2c9ccc6c94",
+    "client-plugin/server/serve.py": "5fe9bbea4bb527c7fbd790b44e2c06a9c665733519431cf914643ed517986322",
+    "client-plugin/skills/plexus/SKILL.md": "03dc8d6f5f43eb70cb5ebf98fa9d66e6d9835587a17a4ee3c973fa2c876db3a6",
+    "pyproject.toml": "b8ecce12931e4f094a60964e0afc9b50977309f2fb6a177d5dcacba5b4f8922a",
+    "scripts/build_client_package.py": "bb2e6675048be615a1d1779f64848ced14eebdea0ad76b1c5f2036178a1a51fe",
+    "scripts/check_native_client.py": "f2635f43d8c50fb67d419642036423f7968ca19cb843834f660a3beaa5f9acca",
+    "scripts/check_native_workflow.py": "8a793b6975a1ea470cc50a714acb1da03bec74405ab08e1a66f4d0a5b6eb3c93",
+    "scripts/native_build_provenance.py": "ee5a3fe06ffee3961414a750d15a5de80f6ccc25bc6316e4f4bab91c4e0bb46e",
+    "src/plexus/__init__.py": "723284d327421d601501f743c3d607320909c5529729173e846a6cef5d88e9b9",
+    "src/plexus/__main__.py": "080d852b9e90e528dd7af540f3698a713479f8f74e8361cf5a7f9b03dba6198f",
+    "src/plexus/cli.py": "b52067225c26fab7868eb64a657b91b72cc57362a262d6894d51c9c475089347",
+    "src/plexus/graph.py": "b6ee90df23088109ae42995d52a948fbbaa267031a673fe156439cf620d09a22",
+    "src/plexus/manifest.py": "34206622e937c3e8484c8804d8230e34bb2fa3484cbee1ea842f03563d2d2a14",
+    "src/plexus/mcp.py": "cf38c0dea946831cc1de40a80c2aeacf62760df6b86ef7970872f4c48869eb4b",
+    "src/plexus/mesh.py": "bc2ea1ce475b28a2150bda0dbe21e5826b8b1db8e643b1c6fc0b7035907ed19f",
+    "src/plexus/plan.py": "0a56eafc6d5fcd66136753b5c507893f6ca8c6577b7c48b4f9bc7434230a97b5",
+    "src/plexus/receipt.py": "4e67cd67c195a02fe4511d967a257307d63541ae6582c07ed46deec880d0717b",
+    "src/plexus/registry.py": "39bc6e2cc3a7bcfaff56df0d687f86cbf930e0836b9ef8169ba2c59229ab0c3a",
+    "src/plexus/run.py": "b9cbdeb1a89a95bb28e3297296f3edcf01088751a717d5a3e4ed2ff7c8029834"
+  },
+  "status": "RELEASE_CANDIDATE",
+  "version": "0.3.0"
+}
