@@ -100,7 +100,7 @@ GitHub-only release install for 0.2.1 on native PowerShell:
 }
 ```
 
-`plexus-mesh` is not published on PyPI in this release track. A source branch or
+`plexus-mesh` 0.2.2 is published on PyPI; install it with `python -m pip install plexus-mesh`. The GitHub wheel recipes above retain the available 0.2.1 GitHub Release assets. A source branch or
 CI run is not a release; install from the GitHub `v0.2.1` assets only after the
 wheel, sdist, and `SHA256SUMS.txt` are attached to that release.
 
@@ -357,3 +357,7 @@ The long form of this belief: [The Unbundling](https://github.com/HarperZ9/flywh
 ---
 
 **[Zentropy Labs](https://github.com/ZentropyLabs-ai)** · order out of entropy. An independent lab building evidence-first tools that leave a re-checkable artifact behind. Built by Zain Dana Harper in Seattle. The full workbench is at [Project Telos](https://harperz9.github.io).
+
+## 0.3.0 local client distribution candidate
+
+The additional [client package](client-plugin/README.md) includes portable plugin metadata and a Windows x64 MCPB/ZIP build. The source version is 0.3.0; these client packages remain unpublished candidates. Existing release installation commands above retain their released version. Native packages carry their Python runtime. No publisher backend is required.
