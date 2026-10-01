@@ -1,5 +1,15 @@
 # Plexus client package
 
+Plexus reads the manifests your local tools publish and shows which tool produces each capability, which tool consumes it, and the path between any two tools.
+
+## Try it
+
+- Show which tools produce and consume each capability.
+- Plan the pipeline that feeds Crucible.
+- Find the shortest route from Gather to Crucible.
+
+## Details
+
 Discovery, wiring, plans and routes describe manifests. A declared edge does not prove installation, execution, compatibility or successful data transfer. Optional directory arguments read caller-selected manifest files. This adapter never invokes pipeline scripts or probe helpers.
 
 ## Install
