@@ -45,6 +45,22 @@ TOOLS = [
      "inputSchema": {"type": "object", "properties": {}}},
 ]
 
+# MCP tool annotations. Every tool reads manifests and returns a result; none
+# writes, launches a process or opens a connection.
+_TITLES = {
+    "plexus_discover": "Discover the tool mesh",
+    "plexus_wiring": "Capability wiring map",
+    "plexus_plan": "Plan the pipeline for a tool",
+    "plexus_route": "Route between two tools",
+    "plexus.status": "Plexus status",
+    "plexus.doctor": "Plexus readiness check",
+}
+for _tool in TOOLS:
+    _tool["title"] = _TITLES[_tool["name"]]
+    _tool["annotations"] = {"title": _tool["title"], "readOnlyHint": True,
+                            "destructiveHint": False, "idempotentHint": True,
+                            "openWorldHint": False}
+
 
 def _mesh(args: dict):
     mans = list(builtin_manifests())

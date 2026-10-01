@@ -2,7 +2,7 @@
   "author": {
     "name": "Zain Dana Harper"
   },
-  "description": "Plexus local tools with explicit operator bindings.",
+  "description": "Show which local tools produce and consume each capability, and the route between them.",
   "license": "FSL-1.1-MIT",
   "name": "plexus-local",
   "version": "0.3.0"
