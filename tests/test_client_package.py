@@ -7,6 +7,8 @@ import subprocess
 import sys
 import zipfile
 
+import shutil
+
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -229,6 +231,72 @@ def test_traced_environment_reads_are_the_disclosed_python_reads(packaged, tmp_p
         text = (ROOT / 'client-plugin' / name).read_text(encoding='utf-8')
         assert all(f'`{key}`' in text for key in PYTHON_ENV_READS), name
         assert "Plexus's own code reads no environment variable" in text
+
+
+def lf(data):
+    return data.replace(b'\r\n', b'\n')
+
+
+def test_vendored_server_code_matches_the_builder():
+    import build_client_package as package
+    target = ROOT / 'client-plugin' / package.VENDORED
+    committed = {path.relative_to(target).as_posix(): lf(path.read_bytes())
+                 for path in target.rglob('*') if path.is_file()
+                 and '__pycache__' not in path.parts and path.suffix != '.pyc'}
+    expected = {name: lf(data) for name, data in package.vendored().items()}
+    hint = f'client-plugin/server/src is stale; run: {package.SYNC_COMMAND}'
+    assert sorted(committed) == sorted(expected), hint
+    assert [n for n in expected if committed[n] != expected[n]] == [], hint
+
+
+def test_builder_counts_the_vendored_copy_once(tmp_path):
+    import build_client_package as package
+    assert not any(name.startswith(package.VENDORED) for name in package.client_entries())
+    with zipfile.ZipFile(build(tmp_path / 'output')[0]) as z:
+        names = z.namelist()
+        receipt = json.loads(z.read('QUALIFICATION.json'))
+    assert len(names) == len(set(names))
+    assert sorted(n for n in names if n.startswith(package.VENDORED)) == \
+        sorted(package.VENDORED + n for n in package.vendored())
+    assert not any(n.startswith('client-plugin/server/src/') for n in receipt['source_sha256'])
+
+
+def isolated_launch(plugin, tmp_path, requests):
+    server = json.loads((plugin / '.mcp.json').read_text(encoding='utf-8'))['mcpServers'][TOOL]
+    def resolve(value):
+        assert '${user_config.' not in value  # Plexus declares no userConfig
+        return value.replace('${CLAUDE_PLUGIN_ROOT}', str(plugin))
+    command = sys.executable if server['command'] == 'python3' else resolve(server['command'])
+    env = {k: v for k, v in os.environ.items() if k.upper() in {'SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP', 'PATH'}}
+    env.update({k: resolve(v) for k, v in server.get('env', {}).items()})
+    return subprocess.run([command, *map(resolve, server['args'])], env=env, cwd=tmp_path, timeout=60,
+                          input=''.join(json.dumps(r) + '\n' for r in requests), capture_output=True, text=True)
+
+
+def test_plugin_folder_alone_launches_with_the_claude_command(tmp_path):
+    plugin = tmp_path / 'installed'
+    shutil.copytree(ROOT / 'client-plugin', plugin, ignore=shutil.ignore_patterns('__pycache__'))
+    p = isolated_launch(plugin, tmp_path, [request(1, 'initialize'), request(2, 'tools/list')])
+    assert p.returncode == 0, p.stderr
+    rows = [json.loads(line) for line in p.stdout.splitlines()]
+    assert rows[0]['result']['serverInfo']['name'] == TOOL
+    assert {t['name'] for t in rows[1]['result']['tools']} == {
+        'plexus_discover', 'plexus_wiring', 'plexus_plan', 'plexus_route', 'plexus.status', 'plexus.doctor'}
+    shutil.rmtree(plugin / 'server' / 'src')
+    p = isolated_launch(plugin, tmp_path, [request(1, 'tools/list')])
+    assert p.returncode == 1 and not p.stdout
+    assert p.stderr.strip() == 'plexus: the server code is missing from the plugin folder. Reinstall the plugin.'
+
+
+def test_plugin_folder_fits_the_directory_limits():
+    files = [path for path in (ROOT / 'client-plugin').rglob('*')
+             if path.is_file() and '__pycache__' not in path.parts]
+    assert len(files) <= 512
+    # The 256 KiB rule covers code and text. Images and fonts are exempt; the icon stays under 2 MB.
+    exempt = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.woff', '.woff2', '.ttf', '.otf'}
+    assert [p.name for p in files if p.suffix.lower() not in exempt and p.stat().st_size >= 256 * 1024] == []
+    assert [p.name for p in files if p.stat().st_size >= 2 * 1024 * 1024] == []
+    assert not [p for p in files if p.name == '.gitattributes']
 
 
 def test_version_drift_refused(tmp_path,monkeypatch):

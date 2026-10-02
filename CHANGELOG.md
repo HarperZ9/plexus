@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The Claude plugin folder now carries the server code at `client-plugin/server/src/plexus/`, so an install of the folder alone starts. `python scripts/build_client_package.py --sync-vendored` rewrites that copy from `src/`, and a test fails when it drifts. The launcher no longer looks outside the plugin folder; a missing copy prints a one-line message and exits with status 1. A test keeps every code and text file under 256 KiB, images under 2 MB, and the folder at 512 files or fewer.
+- The skill and the MCP tool descriptions say "tool" where they said "organ".
 - The Claude plugin manifest adds the plugin directory listing fields: display name, keywords, homepage, repository, documentation, support, privacy and terms links, and a 1024 px icon. Plexus takes no launch settings, so the manifest declares no `userConfig`. Portable and Codex manifests are unchanged.
 - The client README adds a data and network table derived from the code: Plexus reads built-in and caller-selected manifests, stores nothing, makes no network call and sends no telemetry. Stale binding instructions are removed.
 - The client README and PRIVACY.md add a "What this plugin runs and handles" section covering hooks, the exact launch command, network, files and environment variables. A test fails if the served package starts importing a network or process module or reading the environment.

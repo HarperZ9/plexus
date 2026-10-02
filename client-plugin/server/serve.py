@@ -8,7 +8,11 @@ import sys
 
 TOOL = 'plexus'
 if not getattr(sys, 'frozen', False):
-    sys.path.insert(0, str(Path(__file__).resolve().parent / 'src'))
+    source = Path(__file__).resolve().parent / 'src'
+    if not (source / TOOL / 'mcp.py').is_file():
+        sys.stderr.write(f'{TOOL}: the server code is missing from the plugin folder. Reinstall the plugin.\n')
+        raise SystemExit(1)
+    sys.path.insert(0, str(source))
 
 
 def explicit_path(value, *, directory=False):

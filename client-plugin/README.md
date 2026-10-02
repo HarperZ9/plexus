@@ -15,6 +15,8 @@ Discovery, wiring, plans and routes describe manifests. A declared edge does not
 ## Install
 The source ZIP requires Python 3.11 or newer. Extract the entire archive, then point a local stdio MCP client at an absolute Python executable with arguments `-I -S -B server/serve.py` using the absolute script path. Plexus takes no path, account or grant at launch. The source package is an advanced installation, not self-contained.
 
+The plugin folder carries its own copy of the server code in `server/src`, so a directory install needs nothing from the rest of the repository. If that copy is missing, the server prints "plexus: the server code is missing from the plugin folder. Reinstall the plugin." and exits.
+
 In Claude Code, enabling the plugin asks for nothing. Plexus needs no settings, so the Claude manifest declares no `userConfig` and launches `python3 -I -S -B ${CLAUDE_PLUGIN_ROOT}/server/serve.py` with no further arguments. Replace `python3` with a trusted absolute Python path where necessary.
 
 The Windows x64 native ZIP includes Python and needs no separate Python or Node installation. Extract everything and use the absolute `server/plexus-local.exe` path with no arguments. A client supporting binary MCPB extensions may open the matching MCPB, which has no settings to enter. Both archives use identical executable bytes.
