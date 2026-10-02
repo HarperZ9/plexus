@@ -1,6 +1,6 @@
 ---
 name: plexus-local
-description: Use Plexus for its explicit local tool workflow with operator-owned state and permissions.
+description: Show which of your local tools produce and consume each capability, and plan the route between two tools, from the tools' published manifests. Use when the user asks how their local tools connect.
 ---
 
 Call plexus.status first. If unavailable, report the connection failure without inventing a result.

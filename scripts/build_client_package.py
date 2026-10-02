@@ -68,6 +68,35 @@ def encoded(value):
     return (json.dumps(value, indent=2, sort_keys=True) + '\n').encode()
 
 
+VENDORED = 'server/src/'
+SYNC_COMMAND = 'python scripts/build_client_package.py --sync-vendored'
+
+
+def vendored():
+    """The server code the source ZIP carries under server/src/, keyed by its path there."""
+    return {f'{TOOL}/{name}': data for name, data in entries(ROOT / 'src' / TOOL).items()}
+
+
+def client_entries():
+    """The authored client-plugin files. The vendored server/src copy is derived from src/,
+    so it is left out here and added from src/ once, never counted twice."""
+    return {name: data for name, data in entries(ROOT / 'client-plugin', CLIENT_EXTENSIONS).items()
+            if not name.startswith(VENDORED)}
+
+
+def sync_vendored():
+    """Rewrite client-plugin/server/src from src/, with LF endings, removing stale files."""
+    target = ROOT / 'client-plugin' / VENDORED
+    if target.exists():
+        entries(target)  # refuses linked entries before anything is deleted
+        shutil.rmtree(target)
+    for name, data in vendored().items():
+        path = target / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data.replace(b'\r\n', b'\n'))
+    return sorted(vendored())
+
+
 def listing(plugin):
     """Claude manifest: the shared plugin fields plus the directory listing fields.
 
@@ -134,7 +163,7 @@ def build(output, native=False, mode='dev'):
     output = Path(output).absolute()
     if output.exists():
         raise FileExistsError('output must be a new directory')
-    files = entries(ROOT / 'client-plugin', CLIENT_EXTENSIONS)
+    files = client_entries()
     source = entries(ROOT / 'src' / TOOL)
     inputs = {f'src/{TOOL}/{name}': data for name, data in source.items()}
     inputs.update({f'client-plugin/{name}': data for name, data in files.items()})
@@ -188,7 +217,7 @@ def build(output, native=False, mode='dev'):
             raise ValueError('missing PyInstaller license')
         files['PYINSTALLER-LICENSE.txt'] = copying[0].read_bytes()
     else:
-        files.update({f'server/src/{TOOL}/{name}': data for name, data in source.items()})
+        files.update({VENDORED + name: data for name, data in vendored().items()})
     if any((ROOT / name).read_bytes() != data for name, data in inputs.items()):
         raise ValueError('source changed during build')
     files['QUALIFICATION.json'] = encoded(receipt)
@@ -204,9 +233,17 @@ def build(output, native=False, mode='dev'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('output')
+    parser.add_argument('output', nargs='?')
+    parser.add_argument('--sync-vendored', action='store_true',
+                        help='rewrite client-plugin/server/src from src/ and exit')
     parser.add_argument('--native', action='store_true')
     parser.add_argument('--mode', choices=('dev', 'release'), default='dev')
     args = parser.parse_args()
+    if args.sync_vendored:
+        for name in sync_vendored():
+            print(VENDORED + name)
+        raise SystemExit(0)
+    if not args.output:
+        parser.error('output is required unless --sync-vendored is given')
     for item in build(args.output, args.native, args.mode):
         print(item)
