@@ -21,6 +21,24 @@ The Windows x64 native ZIP includes Python and needs no separate Python or Node 
 
 Portable plugin.json/mcp.json, Claude's .claude-plugin/plugin.json and .mcp.json, and Codex's .codex-plugin/plugin.json are generated from the same source version. The source manifests use python3; replace that command with an absolute trusted Python path if unavailable. No client configuration is modified automatically. ChatGPT or Claude cloud support and marketplace admission are not implied by local MCP compatibility.
 
+## What this plugin runs and handles
+
+**Hooks.** This plugin has no hooks.
+
+**MCP server.** The plugin starts one local server named `plexus`. Claude Code runs it with this command:
+
+`python3 -I -S -B ${CLAUDE_PLUGIN_ROOT}/server/serve.py`
+
+`${CLAUDE_PLUGIN_ROOT}` is the folder where Claude Code installed the plugin. `-I` makes Python ignore `PYTHON*` environment variables and the user's site folder. `-S` skips the `site` module. `-B` stops Python from writing bytecode cache files. The command has no `${user_config.*}` values, because Plexus needs no settings. The server talks to Claude Code only through its standard input and output.
+
+**Network.** Plexus opens no network connection. Its code imports no networking module and starts no other program.
+
+**Files read.** Plexus reads the tool manifests built into its own code. When you or the model name a folder in a call, it also reads the `*.interop.json` files in that folder.
+
+**Files written.** Plexus writes no file and no folder. Each answer is built in memory and returned to Claude Code. Nothing stays after the call returns.
+
+**Environment variables and credentials.** Plexus reads no environment variable and no credential. The shared launcher `server/serve.py` names `MNEME_STATE` and `RELAY_MCP_ROOT`, but only inside branches that run for the Mneme and Relay packages. The Plexus package never reaches them.
+
 ## Data and network
 
 | Question | Answer |

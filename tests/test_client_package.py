@@ -169,6 +169,21 @@ def test_source_zip_carries_icon_and_listing(tmp_path):
     assert 'server/src/plexus/mcp.py' in names and 'server/serve.py' in names
 
 
+def test_disclosure_matches_what_the_server_imports():
+    for name in ('README.md','PRIVACY.md'):
+        text=(ROOT/'client-plugin'/name).read_text(encoding='utf-8')
+        assert '## What this plugin runs and handles' in text
+        assert 'python3 -I -S -B ${CLAUDE_PLUGIN_ROOT}/server/serve.py' in text
+    # The disclosure says Plexus opens no connection, starts no program and reads no
+    # environment variable. Fail if the served package gains any of those.
+    import re
+    for path in (ROOT/'src'/TOOL).glob('*.py'):
+        code=path.read_text(encoding='utf-8')
+        assert not re.search(r'^\s*(import|from)\s+(socket|subprocess|urllib|http|ssl|asyncio)(\s|\.|$)',code,re.M), path
+        assert 'os.environ' not in code and 'getenv' not in code, path
+    assert not (ROOT/'client-plugin/hooks').exists()
+
+
 def test_version_drift_refused(tmp_path,monkeypatch):
     import build_client_package as package
     (tmp_path/'pyproject.toml').write_text('[project]\nversion="0.9.0"\n')
