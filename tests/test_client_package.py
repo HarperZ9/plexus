@@ -129,6 +129,61 @@ def test_client_root_expansion_is_client_specific():
     assert b'${PLUGIN_ROOT}' not in docs['.mcp.json']
 
 
+def test_claude_manifest_carries_directory_listing_and_prompts_for_bindings():
+    docs=manifests(qualify('dev')[0],False)
+    claude=json.loads(docs['.claude-plugin/plugin.json'])
+    portable=json.loads(docs['plugin.json'])
+    for key in ('homepage','documentationUrl','supportUrl','privacyPolicyUrl','termsOfServiceUrl'):
+        assert claude[key].startswith('https://')
+    assert claude['repository'] == 'https://github.com/HarperZ9/plexus'
+    assert claude['displayName'] == 'Plexus' and 5 <= len(claude['keywords']) <= 8
+    assert all(k == k.lower() for k in claude['keywords'])
+    assert claude['icon'] == './.claude-plugin/icon.png'
+    assert {k: claude[k] for k in portable} == portable
+    assert 'icon' not in portable and 'displayName' not in portable
+    # Plexus takes no launch value, so there is nothing to prompt for and no placeholder to read.
+    assert 'userConfig' not in claude
+    server=json.loads(docs['.mcp.json'])['mcpServers'][TOOL]
+    assert server['command'] == 'python3' and server['env'] == {}
+    assert server['args'] == ['-I','-S','-B','${CLAUDE_PLUGIN_ROOT}/server/serve.py']
+    assert json.loads(docs['.codex-plugin/plugin.json']).keys() - portable.keys() == {'skills','mcpServers'}
+
+
+def test_committed_icon_is_a_square_png_the_directory_accepts():
+    data=(ROOT/'client-plugin/.claude-plugin/icon.png').read_bytes()
+    assert data[:8] == bytes([137,80,78,71,13,10,26,10]) and data[12:16] == b'IHDR'
+    width,height=int.from_bytes(data[16:20],'big'),int.from_bytes(data[20:24],'big')
+    assert width == height and 512 <= width <= 2048 and len(data) < 2*1024*1024
+
+
+def test_committed_manifests_match_generated_contract():
+    for name,expected in manifests(qualify('dev')[0],False).items():
+        assert json.loads((ROOT/'client-plugin'/name).read_text()) == json.loads(expected), name
+
+
+def test_source_zip_carries_icon_and_listing(tmp_path):
+    with zipfile.ZipFile(build(tmp_path/'output')[0]) as z:
+        names=set(z.namelist())
+        assert z.read('.claude-plugin/icon.png') == (ROOT/'client-plugin/.claude-plugin/icon.png').read_bytes()
+        assert json.loads(z.read('.claude-plugin/plugin.json'))['displayName'] == 'Plexus'
+    assert 'server/src/plexus/mcp.py' in names and 'server/serve.py' in names
+
+
+def test_disclosure_matches_what_the_server_imports():
+    for name in ('README.md','PRIVACY.md'):
+        text=(ROOT/'client-plugin'/name).read_text(encoding='utf-8')
+        assert '## What this plugin runs and handles' in text
+        assert 'python3 -I -S -B ${CLAUDE_PLUGIN_ROOT}/server/serve.py' in text
+    # The disclosure says Plexus opens no connection, starts no program and reads no
+    # environment variable. Fail if the served package gains any of those.
+    import re
+    for path in (ROOT/'src'/TOOL).glob('*.py'):
+        code=path.read_text(encoding='utf-8')
+        assert not re.search(r'^\s*(import|from)\s+(socket|subprocess|urllib|http|ssl|asyncio)(\s|\.|$)',code,re.M), path
+        assert 'os.environ' not in code and 'getenv' not in code, path
+    assert not (ROOT/'client-plugin/hooks').exists()
+
+
 def test_version_drift_refused(tmp_path,monkeypatch):
     import build_client_package as package
     (tmp_path/'pyproject.toml').write_text('[project]\nversion="0.9.0"\n')

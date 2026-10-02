@@ -16,6 +16,11 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = 'plexus'
 DESCRIPTION = 'Show which local tools produce and consume each capability, and the route between them.'
+SITE = 'https://harperz9.github.io'
+REPOSITORY = 'https://github.com/HarperZ9/' + TOOL
+CLIENT_EXTENSIONS = frozenset({'.py', '.md', '.json', '.png'})
+KEYWORDS = ['tool-discovery', 'capability-graph', 'interop', 'pipeline-planning', 'routing',
+            'manifests', 'local-first']
 
 
 def entries(root, extensions=frozenset({'.py', '.md', '.json'})):
@@ -63,6 +68,18 @@ def encoded(value):
     return (json.dumps(value, indent=2, sort_keys=True) + '\n').encode()
 
 
+def listing(plugin):
+    """Claude manifest: the shared plugin fields plus the directory listing fields.
+
+    Plexus takes no launch path or grant, so the listing declares no userConfig."""
+    support = f'{SITE}/plugins/{TOOL}'
+    return {**plugin, 'displayName': TOOL.title(), 'keywords': KEYWORDS,
+            'homepage': support + '/support.html', 'repository': REPOSITORY,
+            'documentationUrl': REPOSITORY + '/blob/main/client-plugin/README.md',
+            'supportUrl': support + '/support.html', 'privacyPolicyUrl': support + '/privacy.html',
+            'termsOfServiceUrl': support + '/terms.html', 'icon': './.claude-plugin/icon.png'}
+
+
 def manifests(version, native):
     executable = f'server/{TOOL}-local.exe'
     command = '${PLUGIN_ROOT}/' + executable if native else 'python3'
@@ -73,7 +90,7 @@ def manifests(version, native):
     plugin = {'name': TOOL + '-local', 'version': version,
               'description': DESCRIPTION,
               'author': {'name': 'Zain Dana Harper'}, 'license': 'FSL-1.1-MIT'}
-    files = {'plugin.json': encoded(plugin), '.claude-plugin/plugin.json': encoded(plugin),
+    files = {'plugin.json': encoded(plugin), '.claude-plugin/plugin.json': encoded(listing(plugin)),
              '.codex-plugin/plugin.json': encoded({**plugin, 'skills': './skills/', 'mcpServers': './mcp.json'}),
              'mcp.json': encoded(config), '.mcp.json': encoded(config).replace(b'${PLUGIN_ROOT}', b'${CLAUDE_PLUGIN_ROOT}')}
     if native:
@@ -117,7 +134,7 @@ def build(output, native=False, mode='dev'):
     output = Path(output).absolute()
     if output.exists():
         raise FileExistsError('output must be a new directory')
-    files = entries(ROOT / 'client-plugin')
+    files = entries(ROOT / 'client-plugin', CLIENT_EXTENSIONS)
     source = entries(ROOT / 'src' / TOOL)
     inputs = {f'src/{TOOL}/{name}': data for name, data in source.items()}
     inputs.update({f'client-plugin/{name}': data for name, data in files.items()})

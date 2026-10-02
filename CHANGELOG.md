@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- The Claude plugin manifest adds the plugin directory listing fields: display name, keywords, homepage, repository, documentation, support, privacy and terms links, and a 1024 px icon. Plexus takes no launch settings, so the manifest declares no `userConfig`. Portable and Codex manifests are unchanged.
+- The client README adds a data and network table derived from the code: Plexus reads built-in and caller-selected manifests, stores nothing, makes no network call and sends no telemetry. Stale binding instructions are removed.
+- The client README and PRIVACY.md add a "What this plugin runs and handles" section covering hooks, the exact launch command, network, files and environment variables. A test fails if the served package starts importing a network or process module or reading the environment.
+
 ## 0.3.0 - 2026-10-01
 
 - Adds portable, Claude and Codex client manifests, a scoped skill, privacy guidance and troubleshooting.
