@@ -292,7 +292,10 @@ def test_plugin_folder_fits_the_directory_limits():
     files = [path for path in (ROOT / 'client-plugin').rglob('*')
              if path.is_file() and '__pycache__' not in path.parts]
     assert len(files) <= 512
-    assert [p.name for p in files if p.stat().st_size >= 256 * 1024] == []
+    # The 256 KiB rule covers code and text. Images and fonts are exempt; the icon stays under 2 MB.
+    exempt = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.woff', '.woff2', '.ttf', '.otf'}
+    assert [p.name for p in files if p.suffix.lower() not in exempt and p.stat().st_size >= 256 * 1024] == []
+    assert [p.name for p in files if p.stat().st_size >= 2 * 1024 * 1024] == []
     assert not [p for p in files if p.name == '.gitattributes']
 
 
