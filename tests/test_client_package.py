@@ -184,6 +184,53 @@ def test_disclosure_matches_what_the_server_imports():
     assert not (ROOT/'client-plugin/hooks').exists()
 
 
+PYTHON_ENV_READS = {'COLUMNS', 'LINES', 'LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG'}
+ENV_TRACER = """import io, os, runpy, sys
+seen = set()
+kind = type(os.environ)
+for name in ('__getitem__', 'get', '__contains__'):
+    def wrap(original):
+        def read(self, *a, **k):
+            if a and isinstance(a[0], str):
+                seen.add(a[0])
+            return original(self, *a, **k)
+        return read
+    setattr(kind, name, wrap(getattr(kind, name)))
+script, requests = sys.argv[1:3]
+sys.argv = [script]
+sys.stdin = io.StringIO(open(requests, encoding='utf-8').read())
+real, sys.stdout = sys.stdout, io.StringIO()
+try:
+    runpy.run_path(script, run_name='__main__')
+except SystemExit:
+    pass
+answers, sys.stdout = sys.stdout.getvalue(), real
+print(__import__('json').dumps({'reads': sorted(seen), 'answers': answers.count(chr(10))}))
+"""
+
+
+def test_traced_environment_reads_are_the_disclosed_python_reads(packaged, tmp_path):
+    calls = [('plexus_discover', {}), ('plexus_wiring', {}), ('plexus_plan', {'goal': 'crucible'}),
+             ('plexus_route', {'source': 'gather', 'target': 'crucible'}),
+             ('plexus.status', {}), ('plexus.doctor', {})]
+    rows = [request(1, 'initialize'), request(2, 'tools/list')]
+    rows += [request(3 + i, 'tools/call', name=n, arguments=a) for i, (n, a) in enumerate(calls)]
+    (tmp_path / 'requests.jsonl').write_text(''.join(json.dumps(r) + '\n' for r in rows), encoding='utf-8')
+    (tmp_path / 'tracer.py').write_text(ENV_TRACER, encoding='utf-8')
+    p = subprocess.run([sys.executable, '-I', '-S', '-B', str(tmp_path / 'tracer.py'),
+                        str(packaged / 'server/serve.py'), str(tmp_path / 'requests.jsonl')],
+                       capture_output=True, text=True, cwd=tmp_path, timeout=60)
+    assert p.returncode == 0, p.stderr
+    trace = json.loads(p.stdout.splitlines()[-1])
+    assert trace['answers'] == len(rows)
+    # The tracer must see reads at all, or an empty set would pass vacuously.
+    assert trace['reads'] and set(trace['reads']) <= PYTHON_ENV_READS, trace['reads']
+    for name in ('README.md', 'PRIVACY.md'):
+        text = (ROOT / 'client-plugin' / name).read_text(encoding='utf-8')
+        assert all(f'`{key}`' in text for key in PYTHON_ENV_READS), name
+        assert "Plexus's own code reads no environment variable" in text
+
+
 def test_version_drift_refused(tmp_path,monkeypatch):
     import build_client_package as package
     (tmp_path/'pyproject.toml').write_text('[project]\nversion="0.9.0"\n')

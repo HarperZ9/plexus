@@ -37,7 +37,9 @@ Portable plugin.json/mcp.json, Claude's .claude-plugin/plugin.json and .mcp.json
 
 **Files written.** Plexus writes no file and no folder. Each answer is built in memory and returned to Claude Code. Nothing stays after the call returns.
 
-**Environment variables and credentials.** Plexus reads no environment variable and no credential. The shared launcher `server/serve.py` names `MNEME_STATE` and `RELAY_MCP_ROOT`, but only inside branches that run for the Mneme and Relay packages. The Plexus package never reaches them.
+**Environment variables and credentials.** Plexus's own code reads no environment variable and no credential. The shared launcher `server/serve.py` names `MNEME_STATE` and `RELAY_MCP_ROOT`, but only inside branches that run for the Mneme and Relay packages. The Plexus package never reaches them.
+
+Python's standard library reads six variables while the server starts. The launcher parses its command line with `argparse`. That module reads `COLUMNS` and `LINES` to size help and error text for the terminal. It looks up message translations through `gettext`, which reads `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG`. These values only set text width and language. Plexus does not store them or send them anywhere. A trace of the packaged server through `initialize`, `tools/list` and every tool found no other read.
 
 ## Data and network
 
