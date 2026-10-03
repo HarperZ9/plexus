@@ -12,7 +12,7 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.2.1"
+VERSION = "0.4.0"
 WHEEL = f"plexus_mesh-{VERSION}-py3-none-any.whl"
 SDIST = f"plexus_mesh-{VERSION}.tar.gz"
 SUMS = "SHA256SUMS.txt"

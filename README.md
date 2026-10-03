@@ -9,12 +9,12 @@ to consumer into a runnable pipeline. Zero runtime dependencies.
 MCP tells an agent *that tools exist*. plexus tells it *how their outputs plug
 into each other's inputs*: the layer above a flat tool list.
 
-GitHub-only release install for 0.2.1 on Bash/macOS/Linux:
+GitHub-only release install for 0.4.0 on Bash/macOS/Linux:
 
 ```bash
 set -euo pipefail
-VERSION=0.2.1
-BASE="https://github.com/HarperZ9/plexus/releases/download/v0.2.1"
+VERSION=0.4.0
+BASE="https://github.com/HarperZ9/plexus/releases/download/v0.4.0"
 WHEEL="plexus_mesh-${VERSION}-py3-none-any.whl"
 SDIST="plexus_mesh-${VERSION}.tar.gz"
 SUMS="SHA256SUMS.txt"
@@ -58,13 +58,13 @@ PY
 python -m pip install "$WHEEL"
 ```
 
-GitHub-only release install for 0.2.1 on native PowerShell:
+GitHub-only release install for 0.4.0 on native PowerShell:
 
 ```powershell
 & {
     $ErrorActionPreference = "Stop"
-    $Version = "0.2.1"
-    $Base = "https://github.com/HarperZ9/plexus/releases/download/v0.2.1"
+    $Version = "0.4.0"
+    $Base = "https://github.com/HarperZ9/plexus/releases/download/v0.4.0"
     $Wheel = "plexus_mesh-$Version-py3-none-any.whl"
     $Sdist = "plexus_mesh-$Version.tar.gz"
     $Sums = "SHA256SUMS.txt"
@@ -100,8 +100,8 @@ GitHub-only release install for 0.2.1 on native PowerShell:
 }
 ```
 
-`plexus-mesh` 0.2.2 is published on PyPI; install it with `python -m pip install plexus-mesh`. The GitHub wheel recipes above retain the available 0.2.1 GitHub Release assets. A source branch or
-CI run is not a release; install from the GitHub `v0.2.1` assets only after the
+`plexus-mesh` 0.4.0 is published on PyPI; install it with `python -m pip install plexus-mesh`. The GitHub wheel recipes above download the 0.4.0 GitHub Release assets and check them against `SHA256SUMS.txt`. A source branch or
+CI run is not a release; install from the GitHub `v0.4.0` assets only after the
 wheel, sdist, and `SHA256SUMS.txt` are attached to that release.
 
 ```
@@ -318,12 +318,11 @@ mesh to exactly the manifests that produced it.
 ## Install
 
 ```
-python -m pip install plexus_mesh-0.2.1-py3-none-any.whl
+python -m pip install plexus_mesh-0.4.0-py3-none-any.whl
 ```
 
-Use the GitHub release asset and verify it against `SHA256SUMS.txt` first. This
-repository does not claim a PyPI publication for `plexus-mesh` in the 0.2.1
-track. The installed package covers declared and synthetic mesh workflows; it
+Use the GitHub release asset and verify it against `SHA256SUMS.txt` first, or
+install `plexus-mesh` from PyPI, which carries every release from 0.2.2 on. The installed package covers declared and synthetic mesh workflows; it
 does not prove that real external lanes are live or that `probe_lane()` has been
 run against owned services.
 
@@ -360,6 +359,6 @@ The long form of this belief: [The Unbundling](https://github.com/HarperZ9/flywh
 
 Built by **[Zain Dana Harper](https://harperz9.github.io)** in Seattle: evidence-first tools that leave a re-checkable artifact behind. The full workbench is at [Project Telos](https://harperz9.github.io).
 
-## 0.3.0 local client distribution candidate
+## Local client packages
 
-The additional [client package](client-plugin/README.md) includes portable plugin metadata and a Windows x64 MCPB/ZIP build. The source version is 0.3.0; these client packages remain unpublished candidates. Existing release installation commands above retain their released version. Native packages carry their Python runtime. No publisher backend is required.
+The additional [client package](client-plugin/README.md) includes portable plugin metadata and a Windows x64 MCPB/ZIP build. Version 0.3.0 first attached these packages to its GitHub release, and a published GitHub release for each later version carries packages built from that tag. Native packages carry their Python runtime. No publisher backend is required.
