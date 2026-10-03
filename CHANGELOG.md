@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- New `plexus pick "REQUEST"` picks a tool for a plain-language request from what each manifest emits and consumes, with a probability for every tool, and abstains when no tool matches or the top probability is under `--threshold`. On a 51-request held-out set it picked the right tool 57% of the time, abstained on 10%, and abstained requests carried 2.7 times the error of picked ones. Details and the bar set before the run: `docs/PICK.md`.
 - The Claude plugin folder now carries the server code at `client-plugin/server/src/plexus/`, so an install of the folder alone starts. `python scripts/build_client_package.py --sync-vendored` rewrites that copy from `src/`, and a test fails when it drifts. The launcher no longer looks outside the plugin folder; a missing copy prints a one-line message and exits with status 1. A test keeps every code and text file under 256 KiB, images under 2 MB, and the folder at 512 files or fewer.
 - The skill and the MCP tool descriptions say "tool" where they said "organ".
 - The Claude plugin manifest adds the plugin directory listing fields: display name, keywords, homepage, repository, documentation, support, privacy and terms links, and a 1024 px icon. Plexus takes no launch settings, so the manifest declares no `userConfig`. Portable and Codex manifests are unchanged.
