@@ -18,6 +18,35 @@ This bar was committed before the picker was written and before its author saw t
 - **Control.** With the gold labels shuffled, P3 must fail.
 - **Ship rule.** The picker ships as a new command whatever the result, with the numbers below.
 
+## Try it
+
+```bash
+plexus pick "verify a sealed wiki pinned to a commit"
+plexus pick --threshold 0.5 "check this memory still matches its source"
+python -m plexus.pick_bench tests/fixtures/plexus_pick_labels.json
+```
+
+Each tool is scored with BM25 against a document built from its manifest: its name, the title and summary of each capability, and the words of each capability id. A softmax turns the scores into probabilities. The default threshold, 0.23, is the calibrated value from the run below. A threshold of 0.0 abstains only when no tool shares a word with the request.
+
 ## Results
 
-Pending the run.
+Run on 2026-10-03, seed 20261003. Dev half 49 items, test half 51. The calibration rule picked a threshold of 0.23.
+
+| Test half, 51 items | Value |
+|---|---|
+| Top-1 accuracy | 0.57 (29 of 51), Wilson 0.43 to 0.70 |
+| Baseline, dev majority tool (learn) | 0.02 |
+| Abstain rate | 0.10 (5 of 51) |
+| Error rate when picked | 0.37 |
+| Error rate when abstained | 1.00 |
+| Error ratio | 2.7 |
+| Shuffled-label control ratio | 1.15 |
+
+- **P1 passes.** 0.57 against 0.02. The baseline is weak because the dev majority tool appeared once in the test half; uniform guessing over 10 tools would score about 0.10, and the picker clears that too.
+- **P2 passes.** 10% of requests abstain.
+- **P3 passes.** Abstained requests err at 1.00 against 0.37 for picked ones.
+- **The control fails P3 as required.** Shuffled labels give 1.15.
+
+## Limits
+
+The labels come from one labeller, a Claude subagent that saw tool names, capability titles and a one-line purpose written for the task. 51 test items give wide intervals, and 4 in 10 picks are still wrong. Treat a pick as a suggestion to confirm. A tool whose manifest has sparse titles will rarely be picked.

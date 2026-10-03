@@ -4,6 +4,7 @@
   plexus wiring   [...]                      # capability -> (producer, consumer) pairs
   plexus plan --goal ORGAN [...]             # upstream pipeline that feeds ORGAN
   plexus route --from A --to B [...]         # capability path from A to B
+  plexus pick "REQUEST" [--threshold P]      # pick a tool for a request, or abstain
   plexus validate [...]                      # manifest problems (exit 1 if any)
 """
 from __future__ import annotations
@@ -71,6 +72,11 @@ def main(argv: "list[str] | None" = None) -> int:
     rp = sub.add_parser("route"); _add_source_flags(rp)
     rp.add_argument("--from", dest="src", required=True)
     rp.add_argument("--to", dest="dst", required=True)
+    kp = sub.add_parser("pick", help="pick a tool for a request, or abstain")
+    _add_source_flags(kp)
+    kp.add_argument("request", help="the request in plain language")
+    kp.add_argument("--threshold", type=float, default=0.23,
+                    help="abstain when the top tool's probability is under this")
     vp = sub.add_parser("verify"); _add_source_flags(vp)
     vp.add_argument("--plan", required=True,
                     help="a plan/route JSON file (from `plexus plan`/`route`) to re-derive "
@@ -105,6 +111,11 @@ def main(argv: "list[str] | None" = None) -> int:
         return 0
     if args.cmd == "route":
         print(json.dumps(route(discover(mans), args.src, args.dst), indent=2))
+        return 0
+    if args.cmd == "pick":
+        from .pick import pick
+        result = pick(discover(mans), args.request, threshold=args.threshold)
+        print(json.dumps(result, indent=2))
         return 0
     if args.cmd == "verify":
         from .receipt import verify_plan

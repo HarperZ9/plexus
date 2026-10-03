@@ -195,6 +195,8 @@ body cannot make it agree with itself. And the receipt carries a method version
 that has to match before anything else is compared, so a plan written by an older
 plexus is reported as failing rather than silently re-interpreted under new rules.
 
+Not sure which tool a request belongs to? `plexus pick "REQUEST"` returns a probability for each tool and abstains when none fits. Measured results are in [docs/PICK.md](docs/PICK.md).
+
 ## How a tool plugs in
 
 A manifest is plain JSON. A tool ships one and it joins the mesh. Drop
