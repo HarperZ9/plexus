@@ -1,6 +1,20 @@
-<p align="center"><img src="docs/art/plexus-header.svg" alt="plexus: toolchain wiring discovery. Point it at your tools and it computes how they plug together." width="100%"></p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/HarperZ9/plexus/main/docs/art/hero-dark.svg">
+  <img src="https://raw.githubusercontent.com/HarperZ9/plexus/main/docs/art/hero-light.svg" alt="plexus: Discovers what tools emit and consume, then wires them together. Clusters of small nodes, named discover, match, wire and run, are wired to their neighbours and bundled through a bright core." width="100%">
+</picture>
 
 # plexus
+
+Discovers what tools emit and consume, then wires them together.
+
+```
+python -m pip install plexus-mesh
+```
+
+[![version: 0.4.0](https://img.shields.io/badge/version-0.4.0-e6e1d6?style=flat-square&labelColor=1a1712)](https://pypi.org/project/plexus-mesh/)
+[![CI](https://github.com/HarperZ9/plexus/actions/workflows/ci.yml/badge.svg)](https://github.com/HarperZ9/plexus/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-FSL--1.1--MIT-e6e1d6?style=flat-square&labelColor=1a1712)](https://github.com/HarperZ9/plexus/blob/main/LICENSE)
+![python 3.11+](https://img.shields.io/badge/python-3.11%2B-e6e1d6?style=flat-square&labelColor=1a1712)
 
 **Capability discovery and auto-wiring for agent toolchains.** Point it at a set
 of tools and it discovers what each one emits and consumes, then wires producer
