@@ -142,6 +142,55 @@ The [animated explainer](https://harperz9.github.io/repo-explainers/plexus.html)
 walks through two small manifests wired into one edge, the unmet input and terminal output plexus names, a plan with its receipt, verify passing and then failing after a manifest changes, and the built-in ten-tool mesh. Every value on it is output from this repository. Its
 source is [docs/explainer/index.html](docs/explainer/index.html).
 
+## Watch
+
+No concept film fits this tool closely yet. The walkthrough below covers it in text, with real commands and output.
+
+Video walkthrough: coming with the next release.
+
+## Walkthrough
+
+Install it, run it once, then use the main feature. Each command below is real, and so is its output.
+
+1. **Install.** Install from PyPI. Python 3.11 or newer; discovery runs no tool.
+
+   ```text
+   $ python -m pip install plexus-mesh
+   ```
+
+2. **First run: is there a route?.** Ask whether one tool's output can reach another's input through the built-in manifests.
+
+   ```text
+   $ plexus route --from gather --to crucible --builtin
+     "connected": true,
+     "hops": 1,
+   ```
+
+3. **Discover your own tools.** Point plexus at a folder of manifests to see each tool's ports.
+
+   ```text
+   $ plexus discover --dir m
+   producer    notes
+   consumer    review
+   capability  notes.summary/1
+   self_loop   false
+   via         src/notes/summary.py:build
+   evidence    declared
+   ```
+
+4. **Plan and verify a pipeline.** Plan a pipeline toward a goal, then verify the plan against the manifests you have now.
+
+   ```text
+   $ plexus plan --dir m --goal review
+   order    notes -> review
+   sources  notes
+   cyclic   []
+   receipt  plexus.plan-receipt/1, method plexus-plan/1
+     notes   53ab6c24d374afa4...
+     review  0d50accb0759561e...
+     plan_sha256  aeb01289ea823d89...
+   ```
+
 ## The problem
 
 You wire up a set of tools. Each one produces artifacts and accepts inputs, but
