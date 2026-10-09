@@ -136,6 +136,12 @@ plexus is the discovery layer that sits *above* an executor, not another executo
 
 <p align="center"><img src="docs/art/wiring-lane.svg" alt="Eight stages from manifest to verify, ending in still holds or drifted." width="100%"></p>
 
+## See it work, step by step
+
+The [animated explainer](https://harperz9.github.io/repo-explainers/plexus.html)
+walks through two small manifests wired into one edge, the unmet input and terminal output plexus names, a plan with its receipt, verify passing and then failing after a manifest changes, and the built-in ten-tool mesh. Every value on it is output from this repository. Its
+source is [docs/explainer/index.html](docs/explainer/index.html).
+
 ## The problem
 
 You wire up a set of tools. Each one produces artifacts and accepts inputs, but
