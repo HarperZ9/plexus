@@ -142,12 +142,6 @@ The [animated explainer](https://harperz9.github.io/repo-explainers/plexus.html)
 walks through two small manifests wired into one edge, the unmet input and terminal output plexus names, a plan with its receipt, verify passing and then failing after a manifest changes, and the built-in ten-tool mesh. Every value on it is output from this repository. Its
 source is [docs/explainer/index.html](docs/explainer/index.html).
 
-## Watch
-
-No concept film fits this tool closely yet. The walkthrough below covers it in text, with real commands and output.
-
-Video walkthrough: coming with the next release.
-
 ## Walkthrough
 
 Install it, run it once, then use the main feature. Each command below is real, and so is its output.
