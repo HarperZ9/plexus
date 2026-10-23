@@ -171,11 +171,11 @@ ol.walkthrough p{margin:0 0 .3rem;max-width:44rem}
 <section class="block wrap" aria-labelledby="for-you">
   <h2 id="for-you">What it does for you</h2>
   <div class="measure">
-    <p>MCP tells an agent which tools exist. plexus tells it how their outputs plug into each other's inputs. Each tool ships a small manifest; plexus builds the wiring graph, plans the pipeline that feeds the tool you want, and reports what does not connect. A plan carries a receipt tied to the exact manifests it came from, so a changed tool shows up as drift.</p>
+    <p>MCP tells an agent which tools exist. plexus tells it how their outputs plug into each other's inputs. Each tool ships a small manifest; plexus builds the wiring graph, plans the pipeline that feeds the tool you want, and reports the loose ends. A plan carries a receipt tied to the exact manifests it came from, so a changed tool shows up as drift.</p>
   </div>
   <ul class="uses">
     <li><b>Wiring from declarations</b>An edge A to B forms when B consumes a capability A emits. Each edge cites the producer's own source pointer.</li>
-    <li><b>Honest gaps</b>Inputs nothing emits, outputs nothing consumes, feedback loops and duplicate tool ids are all named.</li>
+    <li><b>Gaps, named</b>The report names unmet inputs, terminal outputs, feedback loops and duplicate tool ids.</li>
     <li><b>Plans for a goal</b><code>plexus plan --goal</code> orders the tools that feed one target and names its sources.</li>
     <li><b>Plans you can re-check</b><code>plexus verify</code> re-derives a plan's receipt from the current manifests and exits 1 on drift.</li>
   </ul>
@@ -212,13 +212,13 @@ ol.walkthrough p{margin:0 0 .3rem;max-width:44rem}
       <li class="step" tabindex="-1" data-scene="k1" data-state="s"><div class="card">
         <span class="num">02</span><h3>Discover the edge</h3>
         <p><code>plexus discover</code> matches capability strings. <code>review</code> consumes what <code>notes</code> emits, so one edge forms: notes to review via <code>notes.summary/1</code>.</p>
-        <p>The edge is tagged <code>evidence: declared</code>. plexus copies the producer's module pointer into <code>via</code> but never imports or runs it. The citation is a claim for you to check.</p>
+        <p>The edge is tagged <code>evidence: declared</code>. plexus copies the producer's module pointer into <code>via</code> as a citation for you to check, and leaves the module itself unloaded.</p>
         <p class="src">Source: <a href="https://github.com/HarperZ9/plexus/blob/d889be902e1e293b089266461cffcbe885a401a0/src/plexus/mesh.py">src/plexus/mesh.py</a>; README.md, "Declared, not probed"</p>
       </div></li>
       <li class="step" tabindex="-1" data-scene="k2" data-state="s"><div class="card">
-        <span class="num">03</span><h3>Name what does not connect</h3>
-        <p>Nothing in the set emits <code>style.guide/1</code>, so it is an unmet input: an external or human input, or a tool that is not here. Nothing consumes <code>review.verdict/1</code>, so it is a terminal output.</p>
-        <p>Both come from the same comparison. An unmet input means only that no manifest in this set produces it.</p>
+        <span class="num">03</span><h3>Name the loose ends</h3>
+        <p>In this set, <code>style.guide/1</code> has a consumer and zero producers, so it is an unmet input: it comes from a person, an outside source, or a tool you have yet to add. <code>review.verdict/1</code> has a producer and zero consumers, so it is a terminal output.</p>
+        <p>Both come from one comparison of what the manifests in this set emit and consume.</p>
         <p class="src">Source: <a href="https://github.com/HarperZ9/plexus/blob/d889be902e1e293b089266461cffcbe885a401a0/src/plexus/mesh.py">src/plexus/mesh.py</a>, <code>orphans</code></p>
       </div></li>
       <li class="step" tabindex="-1" data-scene="k3" data-state="s"><div class="card">
@@ -245,7 +245,7 @@ ol.walkthrough p{margin:0 0 .3rem;max-width:44rem}
   <h2 id="walkthrough">Walkthrough</h2>
   <p class="measure">Install it, run it once, then use the main feature. Each command below is real, and so is its output.</p>
   <ol class="walkthrough">
-    <li><h3>Install</h3><p>Install from PyPI. Python 3.11 or newer; discovery runs no tool.</p>
+    <li><h3>Install</h3><p>Install from PyPI. Python 3.11 or newer; discovery reads manifests and leaves the tools idle.</p>
 <pre class="cmd"><code>$ python -m pip install plexus-mesh</code></pre></li>
     <li><h3>First run: is there a route?</h3><p>Ask whether one tool's output can reach another's input through the built-in manifests.</p>
 <pre class="cmd"><code>$ plexus route --from gather --to crucible --builtin
@@ -273,23 +273,23 @@ receipt  plexus.plan-receipt/1, method plexus-plan/1
 </section>
 
 <section class="block wrap" aria-labelledby="limits">
-  <h2 id="limits">What it does not do</h2>
+  <h2 id="limits">Limits</h2>
   <ul class="limits">
-    <li>Edges come from declarations. Discovery never runs a tool, so an edge says two manifests agree. Whether the tools work together is a separate test. <code>probe_lane</code> checks that a lane's server is live.</li>
-    <li>An unmet input means no manifest in the set you gave produces it. plexus reasons about nothing outside that set.</li>
-    <li><code>verify</code> checks a saved plan's receipt against one re-derived from the current manifests. Act on the re-derived plan it reports, not on a saved file you have not re-derived.</li>
-    <li>The built-in manifests are kept in plexus. Their presence does not show that each tool publishes its own manifest.</li>
+    <li>Edges come from declarations, so an edge says two manifests agree. Test that the tools work together separately; <code>probe_lane</code> checks that a lane's server is live.</li>
+    <li>plexus reasons over the set of manifests you gave it. An unmet input is unmet within that set.</li>
+    <li><code>verify</code> checks a saved plan's receipt against one re-derived from the current manifests. Act on the re-derived plan it reports.</li>
+    <li>The built-in manifests are kept in plexus itself. Each tool can also publish its own.</li>
   </ul>
-  <p class="src">Source: README.md at d889be9, "Declared, not probed" and "How a tool plugs in"; src/plexus/receipt.py</p>
+  <p class="src">Source: README.md at d889be9, the sections on declared edges and on how a tool plugs in; src/plexus/receipt.py</p>
 </section>
 
 <section class="block wrap recall" aria-labelledby="recall">
   <h2 id="recall">Check what stuck</h2>
   <p class="measure">Answer each one in your head before you open it.</p>
   <details><summary>When does an edge from A to B form?</summary><p>When B consumes a capability that A emits, directly or through A's consumable_as list.</p></details>
-  <details><summary>What does evidence: declared mean on an edge?</summary><p>The edge comes from what the manifests say. plexus copied the producer's module pointer but did not follow or run it.</p></details>
-  <details><summary>style.guide/1 shows up as an unmet input. Does that mean no such tool exists?</summary><p>No. It means no manifest in the set plexus was given emits it.</p></details>
-  <details><summary>A tool's manifest changes after you saved a plan. What does verify do?</summary><p>It re-derives the receipt from the current manifests, the hashes no longer agree, and it exits 1.</p></details>
+  <details><summary>What does evidence: declared mean on an edge?</summary><p>The edge comes from what the manifests say. plexus copied the producer's module pointer as a citation and left the module unloaded.</p></details>
+  <details><summary>style.guide/1 shows up as an unmet input. What does that tell you?</summary><p>That the manifests plexus was given consume it and leave it unproduced. A tool outside that set may well produce it.</p></details>
+  <details><summary>A tool's manifest changes after you saved a plan. What does verify do?</summary><p>It re-derives the receipt from the current manifests, the hashes differ, and it exits 1.</p></details>
 </section>
 </main>
 <footer class="foot wrap">
