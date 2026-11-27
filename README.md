@@ -389,6 +389,8 @@ install `plexus-mesh` from PyPI, which carries every release from 0.2.2 on. The 
 does not prove that real external lanes are live or that `probe_lane()` has been
 run against owned services.
 
+mcp-name: io.github.harperz9/plexus
+
 ## Library
 
 ```python
