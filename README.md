@@ -13,7 +13,7 @@ python -m pip install plexus-mesh
 
 [![version: 0.4.0](https://img.shields.io/badge/version-0.4.0-e6e1d6?style=flat-square&labelColor=1a1712)](https://pypi.org/project/plexus-mesh/)
 [![CI](https://github.com/HarperZ9/plexus/actions/workflows/ci.yml/badge.svg)](https://github.com/HarperZ9/plexus/actions/workflows/ci.yml)
-[![license](https://img.shields.io/badge/license-FSL--1.1--MIT-e6e1d6?style=flat-square&labelColor=1a1712)](https://github.com/HarperZ9/plexus/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-e6e1d6?style=flat-square&labelColor=1a1712)](https://github.com/HarperZ9/plexus/blob/main/LICENSE)
 ![python 3.11+](https://img.shields.io/badge/python-3.11%2B-e6e1d6?style=flat-square&labelColor=1a1712)
 
 **Capability discovery and auto-wiring for agent toolchains.** Point it at a set
@@ -129,10 +129,10 @@ $ plexus mcp                          # stdio MCP server for agents to query liv
 
 An agent (Claude Code or any MCP client) can point at `plexus mcp` and call
 `plexus_discover` / `plexus_plan` / `plexus_route` while it works, so the mesh is
-consumable mid-task, not just from a human's terminal.
+consumable mid-task as well as from a human's terminal.
 
 How it compares to MCP / LangGraph / Dagster / CrewAI: see [COMPARISON.md](COMPARISON.md).
-plexus is the discovery layer that sits *above* an executor, not another executor.
+plexus is the discovery layer that sits *above* an executor without executing tasks itself.
 
 <p align="center"><img src="docs/art/wiring-lane.svg" alt="Eight stages from manifest to verify, ending in still holds or drifted." width="100%"></p>
 
@@ -218,7 +218,7 @@ $ plexus wiring --builtin
 The Mneme/Crucible replay loop is bidirectional and schema-exact: Crucible emits
 `crucible.replay-template/1` for Mneme to consume, and Mneme emits
 `crucible.replay-pack/1` for Crucible to consume. The existing
-`crucible.thesis/1` Mneme→Crucible route remains a separate declared edge,
+`crucible.thesis/1` Mneme->Crucible route remains a separate declared edge,
 satisfied by Mneme's native `mneme.crucible-export/2` export.
 
 **Plan a pipeline.** "I want to feed `crucible`. What produces its inputs?"
@@ -249,14 +249,14 @@ $ plexus verify --plan plan.json --builtin     # exit 0 if it still holds, 1 if 
 
 `verify` re-derives the plan from the manifests (it never trusts the saved body), so a
 tampered plan is caught, and a tool whose manifest changed since the plan makes the wiring
-drift **visible** instead of letting it silently shift under you. Exit non-zero on drift,
+drift **visible** so it never shifts silently under you. Exit non-zero on drift,
 so it works as a CI check over your toolchain's wiring.
 
 Two things make that check worth running. `verify` rebuilds the receipt from the
-plan it just re-derived, not from the one saved in the file, so editing the saved
+plan it just re-derived without trusting the saved file, so editing the saved
 body cannot make it agree with itself. And the receipt carries a method version
 that has to match before anything else is compared, so a plan written by an older
-plexus is reported as failing rather than silently re-interpreted under new rules.
+plexus is reported as failing with zero silent re-interpretation under new rules.
 
 Not sure which tool a request belongs to? `plexus pick "REQUEST"` returns a probability for each tool and abstains when none fits. Measured results are in [docs/PICK.md](docs/PICK.md).
 
@@ -283,7 +283,7 @@ A manifest is plain JSON. A tool ships one and it joins the mesh. Drop
 An edge `A -> B` forms when `B` consumes a capability that `A` emits (directly,
 or via `consumable_as`, the way a producer declares "my output is also
 consumable as X"). Matching is by capability string, so an edge exists wherever
-the tools DECLARE compatible capabilities. Declarative discovery does not run the tools, so the edge is a declared claim, not a probed result.
+the tools DECLARE compatible capabilities. Declarative discovery does not run the tools, so the edge stays a declared claim until probed.
 
 Plexus commits the built-in registry's exported JSON manifests under
 [`manifests/`](manifests/). Discovery from these Plexus-side files produces the
@@ -294,28 +294,28 @@ or that a declared route has been exercised.
 ### Extended manifests (September 2026)
 
 The registry now covers **ten organs**. Canon and Relay are the two visible
-flagship roles for context and connectivity; Index, mneme, and Plexus keep their
-component boundaries instead of being collapsed into a database or executor.
+flagship roles for context and connectivity; Index alongside mneme and Plexus keep their
+component boundaries without collapsing into a database or executor.
 
-- **canon**: context and continuity flagship. It declares the shipped record
+- `canon`: context and continuity flagship. It declares the shipped record
   envelope, continuity capsule, readiness probe, bootstrap witness, and read-only
   MCP surface. It does not declare universal context capture or shared preflight
   as shipped.
-- **relay**: connectivity and execution flagship. It declares the endpoint
+- `relay`: connectivity and execution flagship. It declares the endpoint
   ladder, MCP run request/result surfaces, hash-chained session ledgers,
   Relay-Verified-Correctness certificates, and remote MCP endpoint. It does not
   declare Canon capsules or Plexus route receipts as consumed until Relay ships
   that adapter.
-- **mneme**: memory recall, provenance chain, and drift component. It remains a
+- `mneme`: memory recall, provenance chain, and drift component. It remains a
   component under the context role, with its CLI/MCP compatibility intact.
-- **index**: gatherer and source-context component. It still owns workspace
-  scanning, context envelopes, freshness, and verification outputs; those are
+- `index`: gatherer and source-context component. It still owns workspace
+  scanning, context envelopes and freshness verification outputs; those are
   derived evidence, not authoritative memory.
-- **learn**: tutor credential/mastery ledger entries, proof lessons,
+- `learn`: tutor credential/mastery ledger entries, proof lessons,
   misconceptions. Consumes crucible theses for proof-lesson derivation.
-- **telos**: room summary, golden workflow verification, workbench status.
+- `telos`: room summary, golden workflow verification, workbench status.
   Consumes flagship-action envelopes for cross-tool reconciliation.
-- **flywheel-infra**: 10 capabilities from the Flywheel infrastructure
+- `flywheel-infra`: 10 capabilities from the Flywheel infrastructure
   controls (egress, lesson, tool-call-receipt, TADR classification,
   governance envelope, credential scan, correlated event, isolation test,
   kill switch, run BOM). Consumes accountable-surface actuation outcomes,
@@ -323,7 +323,7 @@ component boundaries instead of being collapsed into a database or executor.
 
 ### Probe mode
 
-`probe_lane(name)` actually spawns a lane's MCP server and calls
+`probe_lane(name)` spawns a lane's MCP server and calls
 `tools/list` + `status`, returning `{reachable, tools, error}`. Unlike the
 declared manifest (which cites source files without running them), the probe
 verifies the lane is live. `probe_all()` probes every registered lane.
@@ -356,10 +356,10 @@ plexus is also honest about what does **not** connect:
   set emits (an external or human input).
 - `orphans().unconsumed_outputs`: artifacts nobody downstream consumes (terminal
   outputs).
-- `plan(...).cyclic`: feedback loops, surfaced instead of forced into a false
+- `plan(...).cyclic`: feedback loops, surfaced cleanly without forcing a false
   linear order.
 - `discover().collisions`: organ ids declared by more than one manifest, named
-  rather than silently resolved last-writer-wins.
+  with zero silent last-writer-wins overrides.
 
 <p align="center"><img src="docs/art/honesty-lane.svg" alt="Eight stages from a tool set to a report, ending in wired, colliding, or unmet." width="100%"></p>
 
@@ -368,7 +368,7 @@ and an unconsumed output is the mirror of it. Both fall out of the same
 comparison, so neither is a special case someone remembered to write. The set is
 also exactly what you handed it: plexus reads the manifests present and reasons
 about nothing else, which is why an unmet input means only that no manifest here
-produces it, not that no such tool exists.
+produces it, leaving existence unassumed.
 
 ## Receipt
 
@@ -409,18 +409,18 @@ pipeline_script(mesh, "crucible")   # a runnable shell pipeline
 
 ## License
 
-Plexus is fair-source: open to read, run, and build on, with commercial use reserved so the project can fund its own development. See [LICENSE](LICENSE).
+Plexus is fair-source: open to read and build on, with commercial use reserved so the project can fund its own development. See [LICENSE](LICENSE).
 
 ## What this believes
 
 This tool is one part of a family that holds a single belief steady across
 every surface: knowledge open to anyone who can attain the means; acceptance
 decided by external checks, never reputation; every result re-runnable;
-honest nulls first-class; ownership earned by comprehension; learning woven
+honest nulls on equal footing; ownership earned by comprehension; learning woven
 into the work. The full text lives in [CREDO.md](CREDO.md).
 The long form of this belief: [The Unbundling](https://github.com/HarperZ9/flywheel/blob/main/docs/essays/2026-07-13-the-unbundling.md).
 
----
+
 
 Built by **[Zain Dana Harper](https://harperz9.github.io)** in Seattle: evidence-first tools that leave a re-checkable artifact behind. The full workbench is at [Project Telos](https://harperz9.github.io).
 
